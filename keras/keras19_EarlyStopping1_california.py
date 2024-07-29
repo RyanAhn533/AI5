@@ -22,8 +22,8 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.75, shuff
 model = Sequential()
 model.add(Dense(1, input_dim=8))
 model.add(Dense(5))
-model.add(Dense(5))
-model.add(Dense(5))
+model.add(Dense(10))
+model.add(Dense(10))
 model.add(Dense(1))
 
 #컴파일, 훈련

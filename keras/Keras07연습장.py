@@ -27,3 +27,5 @@ loss = model.evaluate(x, y)
 results = model.predict([[10,31,211]]) 
 print('로스 : ', loss)
 print('[10,31,211]의 예측값 : ', results)
+
+print(1)
