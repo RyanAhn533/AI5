@@ -1,5 +1,5 @@
 from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.layers import Dense
 import sklearn as sk
 from sklearn.datasets import load_boston
 import numpy as np
@@ -23,7 +23,7 @@ y = dataset.target
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8, shuffle=True, random_state=3)
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-scaler = StandardScaler()
+scaler = MinMaxScaler()
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
@@ -38,13 +38,9 @@ print(np.min(x_test), np.max(x_test))
 model = Sequential()
 model.add(Dense(128, input_dim=13, activation='relu'))
 model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.5))
 model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.5))
 model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.5))
 model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.5))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(16, activation='relu'))
 model.add(Dense(8, activation='relu'))
@@ -70,10 +66,10 @@ mcp = ModelCheckpoint(
     monitor='val_loss', 
     mode='auto',
     verbose=1,
-    save_best_only=True, filepath=("./_save/keras32/keras32_Dropout.h1"))
+    save_best_only=True, filepath=("./_save/keras30/keras30_1_save_model.h1"))
 
-hist = model.fit(x_train, y_train, epochs=100, verbose = 2, 
-                 batch_size=128, validation_split=0.3,
+hist = model.fit(x_train, y_train, epochs=1000, verbose = 2, 
+                 batch_size=32, validation_split=0.3,
                  callbacks=[es, mcp]) # valtidation_data=(x_val, y_val)
 end  = t.time()
 
