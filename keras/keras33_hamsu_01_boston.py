@@ -18,6 +18,8 @@ scaler = StandardScaler()
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
+print(type(x))
+print(type(y))
 
 # 모델 구성 (함수형)
 input1 = Input(shape=(13,))
@@ -54,7 +56,6 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_test, y_predict)
 print('r2 score :', r2)
 
-exit()
 
 from sklearn.datasets import load_boston   
 import numpy as np

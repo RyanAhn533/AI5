@@ -1,185 +1,103 @@
-#url : https://www.kaggle.com/competitions/santander-customer-transaction-prediction/data?select=test.csv
+#https://www.kaggle.com/competitions/santander-customer-transaction-prediction/data
+
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
-import time
-from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping
-from sklearn.metrics import r2_score, accuracy_score
-from sklearn.preprocessing import StandardScaler
-import seaborn as sns
-import matplotlib.pyplot as plt
-import scipy as sp
-import scipy.stats
-
-path = "C:/프로그램/ai5/_data/kaggle/otto/"
-
-train_csv = pd.read_csv(path + "train.csv", index_col=0)
-test_csv = pd.read_csv(path + "test.csv", index_col=0)
-samplesubmission1_csv = pd.read_csv(path + "samplesubmission.csv", index_col=0)
-
-print(train_csv.select_dtypes(include=['object']).columns)
-print(test_csv.select_dtypes(include=['object']).columns)
-
-train_csv.info()
-test_csv.info()
-print(train_csv['target'].value_counts())
-train_csv['target'] = train_csv['target'].replace({'Class_1' : 1, 'Class_1' : 1, 'Class_2' : 2, 'Class_3' : 3, 'Class_4' : 4, 'Class_5' : 5, 'Class_6' : 6, 'Class_7' : 7, 'Class_8' : 8, 'Class_9' : 9, })
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import time
 
 
+path = "C:/프로그램/ai5/_data/kaggle/santander/"
 
-x = train_csv.drop(['target'], axis=1)
-"""
-scaler = StandardScaler()
-scaler.fit(x)
-x = scaler.transform(x)
-"""
+train_csv = pd.read_csv(path + 'train.csv', index_col=0)
+test_csv = pd.read_csv(path + 'test.csv', index_col=0)
+sampleSubmission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
+
+x = train_csv.drop('target', axis=1)
 y = train_csv['target']
+
 print(x.shape)
 print(y.shape)
-y = pd.get_dummies(y)
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3, stratify=y)
+# y = pd.get_dummies(y)
 
+print(y.shape)
 
-from sklearn.preprocessing import MinMaxScaler, StandardScaler,MaxAbsScaler, RobustScaler
-scaler = RobustScaler()
-"""
-MaxAbsScaler
-loss : 0.5624394416809082
-acc : 0.789
-r2_score :  0.6154876429320677
-acc_score :  0.7407886231415644
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, shuffle=True, random_state=1542, stratify=y)
 
-RobustScaler
-loss : 0.5512962341308594
-acc : 0.792
-r2_score :  0.6248450659451026
-acc_score :  0.7491919844861021
-"""
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MaxAbsScaler, RobustScaler
+scaler = MaxAbsScaler()
 scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
+test_csv = scaler.transform(test_csv)
 
+# from sklearn.preprocessing import MinMaxScaler
+# scaler = MinMaxScaler()
+# scaler.fit(x_train)
+# x_train = scaler.transform(x_train)
+# x_test = scaler.transform(x_test)
 
+#2 모델구성
 
-
-#모델
 model = Sequential()
-model.add(Dense(512, input_dim=93, activation='relu'))
-model.add(Dense(256, activation='relu'))
-model.add(Dense(128, activation='relu'))
-model.add(Dense(128, activation='relu'))
-model.add(Dense(128, activation='relu'))
-model.add(Dense(128, activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(9, activation='softmax'))
+model.add(Dense(128, activation = 'relu', input_dim = 200))
+model.add(Dense(128, activation = 'relu'))
+model.add(Dense(128, activation = 'relu'))
+model.add(Dense(64, activation = 'relu'))
+model.add(Dense(64, activation = 'relu'))
+model.add(Dense(64, activation = 'relu'))
+model.add(Dense(32, activation = 'relu'))
+model.add(Dense(32, activation = 'relu'))
+model.add(Dense(1, activation = 'sigmoid'))
 
-#컴파일 훈련
-model.compile(
-    loss='categorical_crossentropy',
-    optimizer='adam',
-    metrics=['acc'])
-es= EarlyStopping(monitor='val_loss', mode = 'min', patience=2,
-                  restore_best_weights=True)
+# 3 컴파일 훈련
+model.compile(loss = 'binary_crossentropy', optimizer = 'adam', metrics=['accuracy'])
 
-model.fit(x_train, y_train, epochs=100, batch_size=1024,
-          verbose=1, validation_split=0.2, callbacks=[es])
+start_time = time.time()
 
+es = EarlyStopping(
+    monitor = 'val_loss',
+    mode = 'min',
+    patience = 30,
+    restore_best_weights=True
+)
 
-#평가예측
+model.fit(x_train, y_train, epochs=100, batch_size=1024, verbose=1, validation_split=0.25, callbacks=[es])
 
+end_time = time.time()
+
+#4 평가 예측
 loss = model.evaluate(x_test, y_test)
-print('loss :', loss[0])
-print('acc :', round(loss[1],3))
+print("로스 : ", loss[0])
+print("정확도 : ", round(loss[1], 3))
+print("시간", round(end_time - start_time, 2), '초')
 
 y_pred = model.predict(x_test)
-r2 = r2_score(y_test, y_pred)
-print('r2_score : ', r2)
-y_pred = np.round(y_pred)
-accuracy_score = accuracy_score(y_test, y_pred)
-print('acc_score : ', accuracy_score)
-
-
+print(y_pred)
 
 y_submit = model.predict(test_csv)
 y_submit = np.round(y_submit)
 
-print(y_submit[:10])
+sampleSubmission['target'] = y_submit
 
-"""
-samplesubmission_csv['calss1'] = y_submit[:0].astype('int')
-samplesubmission_csv['calss2'] = y_submit[:1].astype('int')
-samplesubmission_csv['calss3'] = y_submit[:2].astype('int')
-samplesubmission_csv['calss4'] = y_submit[:3].astype('int')
-samplesubmission_csv['calss5'] = y_submit[:4].astype('int')
-samplesubmission_csv['calss6'] = y_submit[:5].astype('int')
-samplesubmission_csv['calss7'] = y_submit[:6].astype('int')
-samplesubmission_csv['calss8'] = y_submit[:7].astype('int')
-samplesubmission_csv['calss9'] = y_submit[:8].astype('int')
-"""
+sampleSubmission.to_csv(path+'samplesubmission_0724_1520.csv') 
 
+# 로스 :  0.24495652318000793
+# 정확도 :  0.911
 
+# minmaxscaler
+# 로스값 :  0.13892140984535217
+# 정확도 :  0.953
 
-for i in range(9) :
-    samplesubmission1_csv['Class_' + str(i + 1)] = y_submit[:, i].astype('int')
+# standard scalering
+# 로스 값 : 0.7609817981719971
+# 정확도 :  0.714 
 
-samplesubmission1_csv.to_csv(path + "otto_lotto_1.csv")
-
-
-
-
-
-
-"""
-
-전
-loss : 0.5491447448730469
-acc : 0.793
-r2_score :  0.6262784858081455
-acc_score :  0.7477914242620125
-[[0. 0. 0. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 1. 0. 0. 0.]
- [0. 0. 0. 0. 0. 1. 0. 0. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 0. 1.]
- [0. 0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 0. 0.]]
- 
- 후
- loss : 0.576949954032898
-acc : 0.785
-r2_score :  0.6056809850919834
-acc_score :  0.7275910364145658
-[[0. 0. 0. 1. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1. 0.]
- [0. 0. 0. 0. 0. 1. 0. 0. 0.]
- [0. 0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1. 0.]
- [0. 0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1. 0.]]
- 
- StandardScaler
- loss : 0.5697697997093201
-acc : 0.792
-r2_score :  0.616736147830445
-acc_score :  0.7496229260935143
-[[0. 1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 1. 0. 0. 0.]
- [0. 0. 0. 0. 0. 1. 0. 0. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 0. 1.]
- [0. 0. 1. 0. 0. 0. 0. 0. 0.]
- [0. 0. 0. 0. 0. 0. 0. 1. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 1. 0. 0. 0. 0. 0. 0. 0.]
- [0. 0. 1. 0. 0. 0. 0. 0. 0.]]
-"""
+# MaxAbsScaler
+# 로스 :  0.24586938321590424
+# 정확도 :  0.911

@@ -13,32 +13,17 @@ import matplotlib.pyplot as plt
 import scipy as sp
 import scipy.stats
 
-path = "C:/프로그램/ai5/_data/kaggle/otto/"
+path = "C:/프로그램/ai5/_data/kaggle/santander/"
 
-train_csv = pd.read_csv(path + "train.csv", index_col=0)
-test_csv = pd.read_csv(path + "test.csv", index_col=0)
-samplesubmission1_csv = pd.read_csv(path + "samplesubmission.csv", index_col=0)
+train_csv = pd.read_csv(path + 'train.csv', index_col=0)
+test_csv = pd.read_csv(path + 'test.csv', index_col=0)
+sampleSubmission = pd.read_csv(path + 'sample_submission.csv', index_col=0)
 
-print(train_csv.select_dtypes(include=['object']).columns)
-print(test_csv.select_dtypes(include=['object']).columns)
-
-train_csv.info()
-test_csv.info()
-print(train_csv['target'].value_counts())
-train_csv['target'] = train_csv['target'].replace({'Class_1' : 1, 'Class_1' : 1, 'Class_2' : 2, 'Class_3' : 3, 'Class_4' : 4, 'Class_5' : 5, 'Class_6' : 6, 'Class_7' : 7, 'Class_8' : 8, 'Class_9' : 9, })
-
-
-
-x = train_csv.drop(['target'], axis=1)
-"""
-scaler = StandardScaler()
-scaler.fit(x)
-x = scaler.transform(x)
-"""
+x = train_csv.drop('target', axis=1)
 y = train_csv['target']
 print(x.shape)
 print(y.shape)
-y = pd.get_dummies(y)
+
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3, stratify=y)
 
