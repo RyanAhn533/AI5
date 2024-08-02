@@ -3,6 +3,7 @@ from tensorflow.keras.datasets import mnist
 import pandas as pd
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
+
 np.set_printoptions(edgeitems=30, linewidth = 1024)
 # print(x_train) #->0이 존내많이 나옴
 """

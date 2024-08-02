@@ -27,15 +27,16 @@ scaler = StandardScaler()
 scaler.fit(x)
 x = scaler.transform(x)
 """
-y = train_csv['target']
 print(x.shape)
 print(y.shape)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3, stratify=y)
-
-
 from sklearn.preprocessing import MinMaxScaler, StandardScaler,MaxAbsScaler, RobustScaler
-scaler = RobustScaler()
+
+scaler = StandardScaler()
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.fit_transform(x_test)
+test_csv = scaler.fit_transform(test_csv)
 """
 MaxAbsScaler
 loss : 0.5624394416809082
@@ -49,31 +50,29 @@ acc : 0.792
 r2_score :  0.6248450659451026
 acc_score :  0.7491919844861021
 """
-scaler.fit(x_train)
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
 
-
+print(x_train.shape)
+print(y_train.shape)
 
 
 #모델
 model = Sequential()
-model.add(Dense(512, input_dim=93, activation='relu'))
+model.add(Dense(256, input_dim=200, activation='relu'))
 model.add(Dense(256, activation='relu'))
 model.add(Dense(128, activation='relu'))
 model.add(Dense(128, activation='relu'))
-model.add(Dense(128, activation='relu'))
-model.add(Dense(128, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(64, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(16, activation='relu'))
-model.add(Dense(9, activation='softmax'))
+model.add(Dense(1, activation='softmax'))
 
 #컴파일 훈련
 model.compile(
     loss='categorical_crossentropy',
     optimizer='adam',
     metrics=['acc'])
-es= EarlyStopping(monitor='val_loss', mode = 'min', patience=2,
+es= EarlyStopping(monitor='val_loss', mode = 'min', patience=20,
                   restore_best_weights=True)
 
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
@@ -81,13 +80,12 @@ mcp = ModelCheckpoint(
     monitor='val_loss', 
     mode='auto',
     verbose=1,
-    save_best_only=True, filepath=("./_save/keras30/keras30_12_save_model.h1"))
+    save_best_only=True, filepath=("./_save/keras31_mcp/keras31_mcp_12_santander.h1"))
 
-model.fit(x_train, y_train, epochs=100, batch_size=1024,
+model.fit(x_train, y_train, epochs=50, batch_size=128,
           verbose=1, validation_split=0.2, callbacks=[es])
 
-model.save("./_save/keras30/keras30_12")
-#model = load_model("./_save/keras30/keras30_12")
+
 
 #평가예측
 
@@ -119,9 +117,6 @@ samplesubmission_csv['calss6'] = y_submit[:5].astype('int')
 samplesubmission_csv['calss7'] = y_submit[:6].astype('int')
 samplesubmission_csv['calss8'] = y_submit[:7].astype('int')
 samplesubmission_csv['calss9'] = y_submit[:8].astype('int')
-"""
-
-
 
 for i in range(9) :
     samplesubmission1_csv['Class_' + str(i + 1)] = y_submit[:, i].astype('int')
@@ -132,8 +127,6 @@ samplesubmission1_csv.to_csv(path + "otto_lotto_1.csv")
 
 
 
-
-"""
 
 전
 loss : 0.5491447448730469

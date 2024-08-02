@@ -19,6 +19,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tensorflow.keras.utils import to_categorical
 import time
 from sklearn.metrics import r2_score, accuracy_score
+
 #1. 데이터
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 # x_train = x_train.reshape(60000,28,28,1)
