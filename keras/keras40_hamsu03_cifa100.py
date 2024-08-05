@@ -30,6 +30,8 @@ y_train = ohe.fit_transform(y_train)
 y_test = ohe.transform(y_test)
 print(x_train.shape)
 print(x_test.shape)
+print(y_train.shape)
+print(y_test.shape)
 
 #2 모델 구성
 input1 = Input(shape=(32,32,3))

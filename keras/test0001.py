@@ -1,110 +1,134 @@
-# https://www.kaggle.com/competitions/playground-series-s4e1/data?select=train.csv
-# 1-3열 index처리
-# 문자를 수치화 해주기 
+# https://www.kaggle.com/competitions/dogs-vs-cats-redux-kernels-edition/data
+
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score
 import time
 
-
-path = "./_data/dacon/diabets/"
-train_csv = pd.read_csv(path + "train.csv", index_col=0)
-test_csv = pd.read_csv(path + "test.csv", index_col=0)
-sample_submission_csv = pd.read_csv(path + "sample_submission.csv", index_col=0)
-#path = "./_data/따릉/" 이렇게 이용해서 pd구문 안을 짧게 만들 수 있음
-print(train_csv.shape) 
-print(test_csv.shape)
-
-encoder = LabelEncoder()
-
-
-
-test_csv = test_csv.drop(['CustomerId','Surname'], axis=1)
-
-test_csv['Geography'] = encoder.fit_transform(test_csv['Geography'])
-test_csv['Gender'] = encoder.fit_transform(test_csv['Gender'])
-train_csv['Geography'] = encoder.fit_transform(train_csv['Geography'])
-train_csv['Gender'] = encoder.fit_transform(train_csv['Gender'])
-
-x = train_csv.drop(['CustomerId','Surname','Exited'], axis=1)
-y = train_csv['Exited']
-
-# from sklearn.preprocessing import MinMaxScaler
-# scalar=MinMaxScaler()
-# x[:] = scalar.fit_transform(x[:])
-
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.3, shuffle= True, random_state= 512)
-
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.preprocessing import MaxAbsScaler, RobustScaler
-
-scaler = RobustScaler()
-scaler.fit(x_train)
-x_train = scaler.transform(x_train)
-x_test = scaler.transform(x_test)
-test_csv = scaler.transform(test_csv)
-
-# print(x_train.shape)
-# print(x_test.shape)
-
-# print(x_test)
-# print(test_csv)
-
-
-#2 모델구성
-model = Sequential()
-model.add(Dense(64,activation='relu', input_dim=10))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(32, activation='relu'))
-model.add(Dense(32, activation='relu'))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(16, activation='relu'))
-model.add(Dense(8, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
-
-#3 컴파일 훈련
-from sklearn.metrics import accuracy_score
-
-
-model.compile(loss= 'binary_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
-start_time = time.time()
-es = EarlyStopping(
-    monitor= 'val_loss',
-    mode = 'min',
-    patience= 30,
-    restore_best_weights= True    
+train_datagen = ImageDataGenerator(
+    rescale=1./255
+)
+test_datagen = ImageDataGenerator(
+    rescale=1./255
 )
 
-model.fit(x_train, y_train, epochs= 1000, batch_size=100, verbose=1, validation_split= 0.25, callbacks=[es])
+
+
+path_train = 'C:/Users/ddong40/ai_2/_data/kaggle/dogs-vs-cats-redux-kernels-edition/train/'
+path_test = 'C:/Users/ddong40/ai_2/_data/kaggle/dogs-vs-cats-redux-kernels-edition/test/'
+path = 'C:/Users/ddong40/ai_2/_save/keras42/cat_dog/'
+path2 = 'C:/Users/ddong40/ai_2/_data/kaggle/dogs-vs-cats-redux-kernels-edition/'
+
+sampleSubmission = pd.read_csv(path2 + 'sample_submission.csv', index_col = 0)
+
+xy_train = train_datagen.flow_from_directory(
+    path_train,
+    target_size=(80,80),
+    batch_size=25000,
+    class_mode='binary',
+    color_mode = 'rgb',
+    shuffle = True    
+)
+
+xy_test = test_datagen.flow_from_directory(
+    path_test,
+    target_size= (80,80),
+    batch_size=12500,
+    class_mode='binary',
+    color_mode='rgb',
+    shuffle=False
+)
+
+x = xy_train[0][0]
+y = xy_train[0][1]
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=100)
+
+x_test1 = xy_test[0][0]
+
+
+print(x_train.shape) #(25000, 100, 100, 3)
+print(y_train.shape) #(25000, )
+print(y_train)
+
+#모델 
+
+model = Sequential()
+model.add(Conv2D(32, 2, input_shape=(80, 80, 3), padding='same'))
+model.add(MaxPooling2D())
+model.add(Dropout(0.2))
+model.add(Conv2D(32, 2, activation='relu', padding='same'))
+model.add(Dropout(0.2))
+model.add(Conv2D(32, 2, activation='relu', padding='same'))
+model.add(Dropout(0.2))
+model.add(Conv2D(32, 2, activation='relu', padding='same'))
+model.add(Flatten())
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(32, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(1, activation='sigmoid'))
+
+model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+start_time = time.time()
+
+es = EarlyStopping(
+    monitor = 'val_loss',
+    mode = 'min',
+    patience = 20,
+    restore_best_weights=True,
+    verbose=1
+)
+
+import datetime
+date = datetime.datetime.now()
+date = date.strftime('%m%d_%H%M')
+
+path1 = './_save/keras42/'
+filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
+filepath = ''.join([path1, 'k30_', date, '_', filename])
+
+
+mcp = ModelCheckpoint(
+    monitor = 'val_loss',
+    mode = 'auto',
+    save_best_only=True,
+    verbose=1,
+    filepath=filepath
+)
+
+model.fit(x_train, y_train, epochs= 500, batch_size=10, verbose=1, validation_split=0.25, callbacks=[es, mcp])
 end_time = time.time()
 
-#4 평가 예측,
+#평가 예측
 loss = model.evaluate(x_test, y_test)
+y_predict = model.predict(x_test)
 
-y_pred = model.predict(x_test)
-print("로스 : ", loss[0])
-print("acc : ", round(loss[1], 3))
+y_test = np.argmax(y_test).reshape(-1, 1)
+y_predict = np.argmax(y_predict).reshape(-1, 1)
 
-y_pred = np.round(y_pred)
+acc = accuracy_score(y_test, y_predict)
 
-accuracy_score(y_test, y_pred)
+y_submit = model.predict(x_test1)
 
-print("acc스코어 : ", accuracy_score)
-print("걸린시간 : ", round(end_time - start_time, 2), "초" )
 
-y_submit = model.predict(test_csv)
-# y_submit = np.round(y_submit)
-y_submit_binary = np.round(y_submit).astype(int)
 
-#5 파일 생성
-sampleSubmission['Exited'] = y_submit_binary
+print('로스 : ', loss[0])
+print('정확도 : ', loss[1])
+print('시간 :', round(end_time - start_time, 3), '초')
 
-sampleSubmission.to_csv(path+'samplesubmission_0723_1239.csv')
 
-print(sampleSubmission['Exited'].value_counts())
+#5. 파일 출력
+sampleSubmission['label'] = y_submit
+# print(sampleSubmission)
+
+sampleSubmission.to_csv(path+'samplesubmission_0802_1631.csv') #to_csv는 이 데이터를 ~파일을 만들어서 거기에 넣어줄거임
+

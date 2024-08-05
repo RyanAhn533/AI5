@@ -108,7 +108,7 @@ mcp = ModelCheckpoint(
     monitor='val_loss', 
     mode='auto',
     verbose=1,
-    save_best_only=True, filepath=("./_save/keras30/keras30_8_save_model.h1"))
+    save_best_only=True, filepath=("./_data/kaggle/keras30_8_save_model.h1"))
 
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 start = t.time()

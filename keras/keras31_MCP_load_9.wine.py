@@ -62,7 +62,7 @@ mcp = ModelCheckpoint(
     mode='auto',
     verbose=1,
     save_best_only=True, filepath=("./_save/keras30/keras30_9_save_model.h1"))
-
+    
 model.fit(x_train,y_train, epochs=300, batch_size=8,
           verbose=1, validation_split=0.2, callbacks=[es])
 

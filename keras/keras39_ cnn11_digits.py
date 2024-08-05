@@ -42,7 +42,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, shuffl
 
 #모델
 model = Sequential()
-model.add(Conv2D(10, (2,2), input_shape=(16,2,2), 
+model.add(Conv2D    (10, (2,2), input_shape=(16,2,2), 
                  strides=1,
                  padding='same')) 
 model.add(Conv2D(filters=64, kernel_size=(2,2),
