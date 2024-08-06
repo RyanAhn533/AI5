@@ -14,6 +14,19 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import BatchNormalization, MaxPool2D
 import tensorflow as tf
 
+train_datagen = ImageDataGenerator(
+    rescale=1/255,
+
+horizontal_flip=True, #수평 뒤집기
+    vertical_flip=True, #수직뒤집기
+    width_shift_range=0.1, #평행이동
+    height_shift_range=0.1, #평행이동 수직
+    rotation_range=5, #정해진 각도만큼 이미지 회전
+    zoom_range=1.2, #축소 또는 확대
+    shear_range=0.7, # 좌표
+    fill_mode="nearest", #비율에 맞춰서 채워라
+    )
+
 
 start = time.time()
 

@@ -37,24 +37,22 @@ xy_data = train_datagen.flow(
     np.zeros(augment_size),
     batch_size=augment_size,    
     shuffle=False,
-).next()
-
-#튜플은 소괄호고 안에꺼 바꿀 수 없다.
-#print(xy_data)
-#print(x_data.shape) #AttributeError: 'tuple' object has no attribute 'shape'
-# 튜플 길이 확인하려면 len으로 확인해야함
-#print(len(xy_data))
+)
+#.next() 안하면 Iterator 이라고 추출 하면  tuple
+#.next()하게되면 batch에 첫번째꺼 안하면 그냥 첫번째꺼
+print(xy_data)
+print(type(xy_data)) # .next()가 있으면 <class 'tuple'>
+# <c있ass 'keras.preprocessing.image.NumpyArrayIterator'>
+#print(xy_data.shape)
+print(len(xy_data))
+#print(xy_data[0].shape) #AttributeError: 'tuple' object has no attribute 'shape'
 print(xy_data[0][0].shape)
-print(xy_data[0].shape)
-print(xy_data[0][1].shape)
-print(xy_data[1][0].shape)
-print(xy_data[1].shape)
-#튜플 안에 넘파이가 들어가 있어서 자료 나옴
-print(xy_data[1][1].shape)
-exit()
+
+"""
 plt.figure(figsize=(7,7))
 for i in range(49):
     plt.subplot(7,7,i+1)
     plt.imshow(xy_data[0][i], cmap='gray')
     
 plt.show()
+"""
