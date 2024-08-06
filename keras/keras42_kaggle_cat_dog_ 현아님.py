@@ -113,7 +113,7 @@ mcp = ModelCheckpoint(
     
 # 모델 훈련
 model.fit(x_train, y_train, 
-          epochs = 1000, 
+          epochs = 100, 
           batch_size = 8, 
           verbose=1, 
           validation_split=0.2, 
@@ -125,8 +125,6 @@ print('acc :', round(loss[1],3))
 
 
 y_predict = model.predict(x_test)
-
-
 y_submit = model.predict(xy_test[0][0], batch_size=8)
 sampleSubmission = pd.read_csv('C:/프로그램/ai5/_data/kaggle/dogs_vs_cats/sample_submission.csv', index_col=0)
 sampleSubmission['label'] = y_submit

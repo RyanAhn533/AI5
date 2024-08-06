@@ -12,8 +12,6 @@ import time
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import BatchNormalization, MaxPool2D
-
-# GPU 메모리 설정 조정
 import tensorflow as tf
 
 

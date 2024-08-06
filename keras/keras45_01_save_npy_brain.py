@@ -50,7 +50,7 @@ xy_test = test_datagen.flow_from_directory(
 class_mode='binary',
 
 color_mode='grayscale',
-shuffle=True)
+)
 
 np_path = 'C:/프로그램/ai5/_data/image/brain/save_npy/'
 np.save(np_path + 'keras45_01_x_train.npy', arr=xy_train[0][0])

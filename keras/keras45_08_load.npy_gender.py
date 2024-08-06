@@ -8,7 +8,7 @@ import time
 from sklearn.model_selection import train_test_split
 
 start_time=time.time()
-np_path = 'c:/ai5/_data/_save_npy/biggest_gender/'
+np_path = 'c:/프로그램/ai5/_data/kaggle/biggest_gender/'
 x_train1=np.load(np_path + 'keras45_07_x_train1.npy')
 y_train1=np.load(np_path + 'keras45_07_y_train1.npy')
 x_train2=np.load(np_path + 'keras45_07_x_train2.npy')
@@ -45,11 +45,8 @@ model.add(MaxPool2D())
 model.add(Dropout(0.25))
 
 model.add(Flatten()) 
-model.add(Dropout(0.5))
 model.add(Dense(1024, activation='relu')) 
-model.add(Dropout(0.25))
 model.add(Dense(512, activation='relu')) 
-model.add(Dropout(0.25))
 model.add(Dense(1, activation='sigmoid'))
                                           
                         
@@ -83,7 +80,7 @@ mcp=ModelCheckpoint(
 
 
 start_time=time.time()
-model.fit(x_train, y_train, epochs=1000, batch_size=16, validation_split=0.2, callbacks=[es, mcp])
+model.fit(x_train, y_train, epochs=30, batch_size=16, validation_split=0.2, callbacks=[es, mcp])
 # model.fit_generator(x_train, y_train,
 #                     epochs=1000,
 #                     verbose=1,
@@ -112,3 +109,13 @@ print("걸린 시간 :", round(end_time-start_time,2),'초')
 # print(y_submit)
 # sample_submission['label'] = y_submit
 # sample_submission.to_csv(path_submission + "sampleSubmission_0803_11.csv")
+
+"""
+loss : 0.345674604177475
+acc : 0.91833
+걸린 시간 : 266.96 초
+
+loss : 0.345674604177475
+acc : 0.91833
+걸린 시간 : 266.96 초
+"""

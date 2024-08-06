@@ -17,6 +17,7 @@ import time
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import BatchNormalization, MaxPool2D
+
 path = "C:\\프로그램\\ai5\\_data\\image\\me\\me1\\2.jpg"
 img = load_img(path, target_size=(200, 200,))
 print(img)

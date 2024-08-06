@@ -41,7 +41,7 @@ xy_train = train_datagen.flow_from_directory(
 class_mode='binary',
 
 color_mode='rgb',
-shuffle=True)
+)
 
 
 x_train,x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][1], train_size=0.7, random_state=3)

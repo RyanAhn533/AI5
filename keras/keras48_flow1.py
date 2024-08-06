@@ -46,47 +46,33 @@ print(arr.shape) #(200, 200, 3)
 print(type(arr))
 img = np.expand_dims(arr, axis=0) #arr = arr.reshape(1,100,100,3)
 print(img.shape)
-path_train = 'C:/프로그램/ai5/_data/kaggle/dogs_vs_cats/train/'
-# 데이터 증강 설정
-train_datagen = ImageDataGenerator(
-    rescale=1./255,
-    horizontal_flip=True, 
-    vertical_flip=True, 
-    width_shift_range=0.1, 
-    height_shift_range=0.1, 
-    rotation_range=1, 
-    zoom_range=0.2, 
-    shear_range=0.7, 
-    fill_mode="nearest"
-)
 
-# 테스트 데이터 증강 설정
-test_datagen = ImageDataGenerator(rescale=1./255)
+######################요기부터 중요########################
+datagen = ImageDataGenerator(
+    rescale=1/255,
+    horizontal_flip=True, #수평 뒤집기
+    vertical_flip=True, #수직뒤집기
+    width_shift_range=0.1, #평행이동
+    height_shift_range=0.1, #평행이동 수직
+    rotation_range=5, #정해진 각도만큼 이미지 회전
+    zoom_range=1.2, #축소 또는 확대
+    shear_range=0.7, # 좌표
+    fill_mode="nearest", #비율에 맞춰서 채워라
+    )
 
-# 데이터 경로 설정
+it = datagen.flow(img, 
+             batch_size=1,
+             )
+print(it)
+print(it.next())
 
+#flow_from_diecory는 이미지를 가져다가 증폭하거나 이것적서 그런 작업을 하는데
+#flow 는 연합을 하거나 증폭을 한다
+fig, ax = plt.subplots(nrows=1, ncols=5, figsize=(10, 10))
 
-# 데이터 로드
-xy_train = train_datagen.flow_from_directory(
-    path_train, target_size=(100, 100), 
-    batch_size=30000, 
-    class_mode='binary',
-    color_mode='rgb',
-    shuffle=True
-)
-path1 = "C:\\프로그램\\ai5\\_data\\image\\me\\"
-xy_test = test_datagen.flow_from_directory(
-    path1, target_size=(100, 100),
-    batch_size=30000, 
-    class_mode='binary',
-    color_mode='rgb',
-    shuffle=True
-)
-
-# 데이터 분리
-x_train, x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][1], train_size=0.7, random_state=3)
-print(xy_train[0][0].shape)
-print(xy_train[0][1].shape)
-
-np.save(path1 + 'keras45_01_x_test.npy', arr=xy_train[0][0])
-np.save(path1 + 'keras45_01_y_test.npy', arr=xy_train[0][1])
+for i in range(5):
+    batch = it.next()
+    ax[i].imshow(batch)
+    ax[i].axis('off')
+    
+plt.show()

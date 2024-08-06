@@ -64,7 +64,6 @@ xy_test = test_datagen.flow_from_directory(
     batch_size=30000, 
     class_mode='binary',
     color_mode='rgb',
-    shuffle=True
 )
 
 # 데이터 분리

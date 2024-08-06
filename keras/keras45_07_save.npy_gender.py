@@ -53,7 +53,7 @@ xy_train2 = test_datagen.flow_from_directory(
 #     shuffle=False, # 어지간하면 셔플할 필요 없음.
 # )  # Found 120 images belonging to 2 classes.
 
-np_path = 'c:/ai5/_data/_save/save_npy/biggest_gender/'
+np_path = 'c:/프로그램/ai5/_data/kaggle/biggest_gender/'
 np.save(np_path + 'keras45_07_x_train1.npy', arr=xy_train1[0][0])
 np.save(np_path + 'keras45_07_y_train1.npy', arr=xy_train1[0][1])
 np.save(np_path + 'keras45_07_x_train2.npy', arr=xy_train2[0][0])
