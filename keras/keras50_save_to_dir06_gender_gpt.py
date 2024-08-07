@@ -26,32 +26,22 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import BatchNormalization, MaxPool2D
 # 데이터 로드
-np_path = 'c:/프로그램/ai5/_data/kaggle/Biggest_gender/'
-x_train1 = np.load(np_path + 'man_x_train1.npy')
-y_train1 = np.load(np_path + 'man_y_train1.npy')
-x_test1 = np.load(np_path + 'man_x_test.npy')
-y_test1 = np.load(np_path + 'man_y_test.npy')
-path = "C:\\프로그램\\ai5\\_data\\image\\me\\me1\\2.jpg"
-img = load_img(path, target_size=(200, 200,))
-path1 = "C:\\프로그램\\ai5\\_data\\image\\me\\"
-arr = img_to_array(img)
-img = np.expand_dims(arr, axis=0)
-test_datagen = ImageDataGenerator(rescale=1./255)
-xy_test = test_datagen.flow_from_directory(
-    path1, target_size=(100, 100),
-    batch_size=30000, 
-    class_mode='binary',
-    color_mode='rgb',
-)
-x_train2 = np.load(np_path + 'woman_x_train1.npy')
-y_train2 = np.load(np_path + 'woman_y_train2.npy')
+np_path = 'c:/프로그램/ai5/_data/새 폴더/'
+x_train1 = np.load(np_path + 'keras49_06_x_train_man.npy')
+y_train1 = np.load(np_path + 'keras49_06_y_train_man.npy')
+
+path = 'C:\\프로그램\\ai5\\_data\\image\\me\\'
+x_test2 = np.load(path + 'me_x_train2.npy')
+
+x_train2 = np.load(np_path + 'keras49_06_x_train_woman.npy')
+y_train2 = np.load(np_path + 'keras49_06_y_train_woman.npy')
 
 # 데이터 결합
 x_train = np.concatenate((x_train1, x_train2), axis=0)
 y_train = np.concatenate((y_train1, y_train2), axis=0)
-x_test = np.concatenate((x_test1, x_train2), axis=0)
-y_test = np.concatenate((y_test1, y_train2), axis=0)
 
+print(x_train.shape)
+print(y_train.shape)
 # 데이터 증강
 train_datagen = ImageDataGenerator(
     rescale=1./255,
@@ -77,15 +67,18 @@ x_augmented = train_datagen.flow(
     shuffle=False
 ).next()[0]
 
-x_train = np.concatenate((x_train, x_augmented), axis=0)
-y_train = np.concatenate((y_train, y_augmented), axis=0)
+x_train3 = np.concatenate((x_train, x_augmented), axis=0)
+y_train3 = np.concatenate((y_train, y_augmented), axis=0)
+
+x_train = np.concatenate((x_train3, x_train1), axis=0)
+y_train = np.concatenate((y_train3, y_train1), axis=0)
 
 # train/test 분할
 x_train, x_test, y_train, y_test = train_test_split(x_train, y_train, train_size=0.9, random_state=42)
 
 # 모델 구성
 model = Sequential()
-model.add(Conv2D(32, (3,3), activation='relu', input_shape=(100, 100, 3), padding='same'))
+model.add(Conv2D(32, (3,3), activation='relu', input_shape=(80, 80, 3), padding='same'))
 model.add(MaxPool2D())
 model.add(Dropout(0.25))
 
@@ -121,13 +114,14 @@ mcp = ModelCheckpoint(monitor='val_loss', mode='auto', verbose=1, save_best_only
 
 # 모델 학습
 start_time = time.time()
-model.fit(x_train, y_train, epochs=30, batch_size=100, validation_split=0.2, callbacks=[es, mcp])
+model.fit(x_train, y_train, epochs=30, batch_size=10, validation_split=0.2, callbacks=[es, mcp])
 end_time = time.time()
 
 # 모델 평가
 loss = model.evaluate(x_test, y_test, verbose=1)
 print('loss :', loss[0])
 print('acc :', round(loss[1],5))
-
+y_predict = model.predict(x_test2)
 # 학습 시간 출력
 print("걸린 시간 :", round(end_time - start_time, 2), '초')
+print(y_predict)

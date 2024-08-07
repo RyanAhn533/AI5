@@ -46,8 +46,10 @@ shuffle=True)
 
 
 x_train,x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][1], train_size=0.7, random_state=3)
-
-
+print(x_train.shape)
+print(x_test.shape)
+print(y_train.shape)
+print(y_test.shape)
 
 #2. 모델 구성
 input1 = Input(shape=(100,100,3))

@@ -6,7 +6,7 @@ import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.datasets import mnist, fashion_mnist, cifar10
 import pandas as pd
-from tensorflow.keras.models import Sequential, Model, load_model
+from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, Input, MaxPooling2D
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
@@ -26,49 +26,50 @@ horizontal_flip=True, #수평 뒤집기
     zoom_range=1.2, #축소 또는 확대
     shear_range=0.7, # 좌표
     fill_mode="nearest", #비율에 맞춰서 채워라
+    
     )
 
 
-np_path = 'C:/프로그램/ai5/_data/image/horse_human/save_npy/'
-x_train = np.load(np_path + "keras45_02_x_train.npy")
-y_train = np.load(np_path + "keras45_02_y_train.npy")
-x_test = np.load(np_path + "keras45_02_x_test.npy")
-y_test = np.load(np_path + "keras45_02_y_test.npy")
+train_datagen = ImageDataGenerator(
+    rescale=1./255,)
+path_train = 'C:/프로그램/ai5/_data/image/horse_human/'
 
 
-augment_size = 10000
+xy_train = train_datagen.flow_from_directory(
+    path_train, target_size=(100, 100), 
+    batch_size=30000, 
+class_mode='binary',
+
+color_mode='rgb',
+shuffle=True)
+
+
+x_train,x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][1], train_size=0.7, random_state=3)
+
+augment_size = 5000
 randidx = np.random.randint(x_train.shape[0], size = augment_size)
 x_augmented = x_train[randidx].copy()
 y_augmented = y_train[randidx].copy()
 
 x_augmented = x_augmented.reshape(
-                                  x_augmented.shape[0], # 40000
-                                  x_augmented.shape[1], #28
+                                  x_augmented.shape[0], 
+                                  x_augmented.shape[1], 
                                   x_augmented.shape[2], 3)
 x_augmented = train_datagen.flow(
     x_augmented, y_augmented,
     batch_size=augment_size,
-    shuffle=False,).next()[0]
-
-x_train = x_train.reshape(50000,32,32,3)
-x_test = x_test.reshape(10000,32,32,3)
+    shuffle=False,
+).next()[0]
+#(1027, 100, 100, 3)
+#(1027,)
+x_train = x_train.reshape(718,100,100,3)
+x_test = x_test.reshape(309,100,100,3)
+print(xy_train[0][0].shape)
+print(xy_train[0][1].shape)
 
 x_train = np.concatenate((x_train,x_augmented), axis = 0)
 print(x_train.shape)
 y_train = np.concatenate((y_train, y_augmented), axis = 0)
-
-
-from sklearn.preprocessing import OneHotEncoder
-ohe = OneHotEncoder(sparse=False)
-y_train = y_train.reshape(-1, 1)
-y_test = y_test.reshape(-1, 1)
-print(x_train.shape)
-print(x_test.shape)
-print(y_train.shape)
-print(y_test.shape)
-y_train = ohe.fit_transform(y_train)
-y_test = ohe.transform(y_test)
-
 
 #2. 모델 구성
 input1 = Input(shape=(100,100,3))
@@ -83,9 +84,8 @@ dense5 = Dense(32, activation='relu')(Flat1)
 output1 = Dense(1, activation='sigmoid')(dense5)
 model = Model(inputs = input1, outputs = output1)
 
-
 #3. 컴파일 훈련
-
+model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 es = EarlyStopping(
     monitor = 'val_loss',
@@ -99,9 +99,9 @@ import datetime
 date = datetime.datetime.now()
 date = date.strftime('%m%d_%H%M')
 
-path1 = './_save/keras45/horse/'
+path1 = './_save/keras36/_cifa10/'
 filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
-filepath = ''.join([path1, 'k45_', date, '_', filename])
+filepath = ''.join([path1, 'k30_', date, '_', filename])
 es = EarlyStopping(monitor='val_loss', mode='min',
                    patience=10,
                    restore_best_weights=True)
@@ -114,7 +114,6 @@ mcp = ModelCheckpoint(
     filepath = filepath
 )
 
-model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 model.fit(x_train, y_train, epochs = 100, batch_size = 64, verbose=1, validation_split=0.2, callbacks=[es, mcp],)
 
@@ -129,3 +128,6 @@ acc = accuracy_score(y_test, np.round(y_predict))
 
 print('로스 : ', loss[0])
 print('acc : ', acc)
+
+#로스 :  0.5409650802612305
+#acc :  0.7265

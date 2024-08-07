@@ -10,7 +10,9 @@ import os
 
 # 경로 설정
 path_train1 = 'C:/프로그램/ai5/_data/kaggle/dogs_vs_cats/train/'
-path_train2 = 'C:/프로그램/ai5/_data/image/cat_and_dog/train/'
+path_train2 = 'C:/프로그램/ai5/_data/kaggle/dogs_vs_cats/test1/'
+path_train3 = 'C:/프로그램/ai5/_data/image/cat_and_dog/train/'
+path_train4 = 'C:/프로그램/ai5/_data/image/cat_and_dog/test/'
 
 # ImageDataGenerator 설정
 train_datagen = ImageDataGenerator(
@@ -20,24 +22,58 @@ train_datagen = ImageDataGenerator(
     rotation_range=15,
     fill_mode='nearest'
 )
-
+test_datagen = ImageDataGenerator(
+    rescale=1./255,
+    horizontal_flip=True,
+    width_shift_range=0.2,
+    rotation_range=15,
+    fill_mode='nearest'
+)
 # 학습 데이터 로드
 xy_train1 = train_datagen.flow_from_directory(
-    path_train1, target_size=(100, 100), 
+    path_train1, target_size=(80, 80), 
     batch_size=30000, 
     class_mode='binary',
     color_mode='rgb',
     shuffle=True
 ).next()
+
+xy_test1 = test_datagen.flow_from_directory(
+    path_train2, target_size=(80, 80),
+    batch_size=30000, 
+    class_mode='binary',
+    color_mode='rgb',
+    shuffle=True
+).next()
+
+
+np_path = 'C:\\프로그램\\ai5\\_data\\mixed_data'
+np.save(np_path + 'cat_dog_kaggle_train.npy', arr=xy_train1)
+
+np_path = 'C:\\프로그램\\ai5\\_data\\mixed_data'
+np.save(np_path + 'cat_dog_kaggle_train.npy', arr=xy_test1)
 
 xy_train2 = train_datagen.flow_from_directory(
-    path_train2, target_size=(100, 100), 
+    path_train3, target_size=(80, 80), 
     batch_size=30000, 
     class_mode='binary',
     color_mode='rgb',
     shuffle=True
 ).next()
+xy_test2 = train_datagen.flow_from_directory(
+    path_train4, target_size=(80, 80),
+    batch_size=30000, 
+    class_mode='binary',
+    color_mode='rgb',
+    shuffle=True
+)
+np_path = 'C:\\프로그램\\ai5\\_data\\mixed_data'
+np.save(np_path + 'cat_dog_kaggle_train.npy', arr=xy_train2)
 
+np_path = 'C:\\프로그램\\ai5\\_data\\mixed_data'
+np.save(np_path + 'cat_dog_kaggle_train.npy', arr=xy_test2)
+
+"""
 # 학습 데이터 병합
 x_train = np.concatenate((xy_train1[0], xy_train2[0]), axis=0)
 y_train = np.concatenate((xy_train1[1], xy_train2[1]), axis=0)
@@ -97,3 +133,4 @@ model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=30, batch_s
 # 4. 평가 및 예측
 loss, acc = model.evaluate(x_test, y_test)
 print(f'Loss: {loss}, Accuracy: {acc}')
+"""
