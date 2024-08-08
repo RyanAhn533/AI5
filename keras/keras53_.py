@@ -22,8 +22,7 @@ x = np.array([[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7],[6,7,8],
              [30,40,50],[40,50,60]])
 y = np.array([4,5,6,7,8,9,10,11,12,13,50,60,70])
 x_predict = np.array([50,60,70])
-print(x.shape ) (13, 3)
-print(y.shape) 
+
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3)
 
@@ -32,16 +31,19 @@ scaler.fit(x_train)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
+from tensorflow.keras.layers import Input, Dense, LSTM, Bidirectional
 
-#아워너80
 
 #2. 모델구성
 model = Sequential()
 #model.add(SimpleRNN(8, input_shape=(3,1))) #3은 time steps, 1은 features
 #model.add(LSTM(8, input_shape=(3,1))) #3은 time steps, 1은 features
 #[8,9,10]의 결과 [[9.770123]
-model.add(GRU(32, input_shape=(3,1))) #3은 time steps, 1은 features
-model.add(Dense(32))
+model.add(LSTM(32, input_shape=(3,1), return_sequences=True)) #3은 time steps, 1은 features
+model.add(LSTM(32,)) #LSTM 안쓰고 Flatten 써줘도 된다. -
+#차원을 맞추려고 / 시계열 데이터라는 확신이 있을 때만 쓴다. LSTM 을 두번이상 때리면 속도가 느려져서 잘 쓰지는 않음
+#왜 두번하냐? -> 시계열 데이터라는 값을 지니고서 고도화를 시키고 싶을 때, 모델로 하이퍼 파라미터 개선을 계속 시킨 후에는 차원이 바뀜
+#그래서 LSTM을 두번 넣어줌
 model.add(Dense(16))
 model.add(Dense(16))
 model.add(Dense(8))
