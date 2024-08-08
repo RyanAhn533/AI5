@@ -39,45 +39,23 @@ print(x.shape)
 
 #2. 모델구성
 model = Sequential()
-#model.add(SimpleRNN(8, input_shape=(3,1))) #3은 time steps, 1은 features
-#model.add(LSTM(8, input_shape=(3,1))) #3은 time steps, 1은 features
-#[8,9,10]의 결과 [[9.770123]
-model.add(GRU(8, input_shape=(3,1))) #3은 time steps, 1은 features
-#[8,9,10]의 결과 [[9.770123]
+model.add(LSTM(10, input_shape=(3,1))) #3은 time steps, 1은 features
+#LSTM이 RNN보다 ㅏㅅ다
 
+model.add(Dense(7))
 
-#행이 데이터의 개수이므로 나머지가 shape
-#행무시 열우선 to input_shape
-model.add(Dense(8))
-model.add(Dense(8))
-model.add(Dense(8))
-model.add(Dense(8))
-model.add(Dense(6))
-model.add(Dense(4))
-model.add(Dense(2))
-model.add(Dense(2))
-model.add(Dense(2))
 model.add(Dense(1))
+model.summary()
 
-#3. 컴파일, 훈련
-model.compile(loss='mse', optimizer='adam')
-es = EarlyStopping(
-    monitor = 'val_loss',
-    mode = 'min',
-    verbose=1,
-    patience=200,
-    restore_best_weights=True
-)
+# _________________________________________________________________
+#  Layer (type)                Output Shape              Param #
+# =================================================================
+#  simple_rnn (SimpleRNN)      (None, 10)                120
 
-model.fit(x, y, epochs = 1000, batch_size = 1, 
-          verbose=1, validation_split=0.2, callbacks=[es],)
+#  dense (Dense)               (None, 7)                 77
 
-#4. 평가, 예측
-results = model.evaluate(x,y)
-print('loss : ', results)
+#  dense_1 (Dense)             (None, 1)                 8
 
-x_pred = np.array([8,9,10]).reshape(1,3,1) #[[[8]]]
-#벡터형태 데이터 (3,) -> (1,3,1)
-#스칼라는 행렬아님
-y_pred = model.predict(x_pred)
-print('[8,9,10]의 결과', y_pred)
+# =================================================================
+
+#입력 망각 출력 Cellstate
