@@ -63,6 +63,9 @@ b1 = b.drop(['T (degC)'], axis=1)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3)
 
+scaler = StandardScaler()
+x_train = scaler.fit_transform(x_train.reshape(-1, x_train.shape[-1])).reshape(x_train.shape)
+x_test = scaler.transform(x_test.reshape(-1, x_test.shape[-1])).reshape(x_test.shape) 
 
 
 """
@@ -125,7 +128,8 @@ from sklearn.metrics import r2_score, mean_squared_error
 
 def RMSE(y_test, y_pred) : 
     return np.sqrt(mean_squared_error(y_test, y_pred))
-rmse = RMSE(y1, y_pred)
+rmse = RMSE(y, y_pred)
 #y_predict = 매개변수
+
 
 print("rmse = ", rmse)
