@@ -1,6 +1,3 @@
-import numpy as np
-import numpy as np
-import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, SimpleRNN, LSTM, GRU
 
@@ -16,10 +13,30 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tensorflow.keras.utils import to_categorical
 import time 
 from sklearn.model_selection import train_test_split
-a = np.array(range(1, 11))
+a = np.array([[1,2,3,4,5,6,7,8,9,10], [9,8,7,6,5,4,3,2,1,0]]).reshape(10,2)
+
 size = 5
-print(a) #[ 1  2  3  4  5  6  7  8  9 10]
-print(a.shape) #(10,)
+
+"""
+[[ 1  2]
+ [ 3  4]
+ [ 5  6]
+ [ 7  8]
+ [ 9 10]
+ [ 9  8]
+ [ 7  6]
+ [ 5  4]
+ [ 3  2]
+ [ 1  0]]
+ """
+
+a = a.reshape(20,1)
+a1 = a[:10,-1]
+b1 = a[10:20, -1]
+a = a1.reshape(10,1)
+b = b1.reshape(10,1)
+
+x = np.concatenate((a,b),axis=1)
 
 def split_x(dataset, size) :
     aaa = []
@@ -29,28 +46,61 @@ def split_x(dataset, size) :
         
     return np.array(aaa)
 
-bbb = split_x(a, size)
-print(bbb)
-"""
-[[ 1  2  3  4  5]
- [ 2  3  4  5  6]
- [ 3  4  5  6  7]
- [ 4  5  6  7  8]
- [ 5  6  7  8  9]
- [ 6  7  8  9 10]]
-"""
-print(bbb.shape) #(6,5)
+bbb1 = split_x(x, size)
 
-x = bbb[:,:-1]
-y = bbb[:, -1]
+print(bbb1)
+print(bbb1.shape)
+x = bbb1[:,:-1]
+y = bbb1[:, -1,0]
+print(x.shape)
+print(y.shape)
+print(y)
 
+"""
+x1 = x[:,-1]
+x2 = x[:,-2]
+print(x1)
+print(x2)
+def split_x(dataset, size) :
+    aaa = []
+    for i in range(len(dataset) - size + 1):
+        subset = dataset[i : (i + size)]
+        aaa.append(subset)
+        
+    return np.array(aaa)
+
+bbb1 = split_x(x1, size)
+
+def split_x(dataset, size) :
+    aaa = []
+    for i in range(len(dataset) - size + 1):
+        subset = dataset[i : (i + size)]
+        aaa.append(subset)
+        
+    return np.array(aaa)
+
+bbb2 = split_x(x2, size)
+
+   
+
+k = np.concatenate((bbb1,bbb2),axis=0)
+print(k)
+x = k[:,:-1]
+y = k[:, -1]
+print(x)
+print(x.shape)
+x = x.reshape(2,6,4)
+y = y.reshape(2,6)
+print(x)
+print(y)
+"""
 
 #2. 모델구성
 model = Sequential()
 #model.add(SimpleRNN(8, input_shape=(3,1))) #3은 time steps, 1은 features
 #model.add(LSTM(8, input_shape=(3,1))) #3은 time steps, 1은 features
 #[8,9,10]의 결과 [[9.770123]
-model.add(LSTM(32, input_shape=(4,1), return_sequences=True)) #3은 time steps, 1은 features
+model.add(LSTM(32, input_shape=(4,2), return_sequences=True)) #3은 time steps, 1은 features
 model.add(LSTM(32,)) #LSTM 안쓰고 Flatten 써줘도 된다. -
 #차원을 맞추려고 / 시계열 데이터라는 확신이 있을 때만 쓴다. LSTM 을 두번이상 때리면 속도가 느려져서 잘 쓰지는 않음
 #왜 두번하냐? -> 시계열 데이터라는 값을 지니고서 고도화를 시키고 싶을 때, 모델로 하이퍼 파라미터 개선을 계속 시킨 후에는 차원이 바뀜
@@ -71,34 +121,13 @@ es = EarlyStopping(
     patience=100,
     restore_best_weights=True
 )
-import datetime
-date = datetime.datetime.now()
-print(date) #2024-07-26 16:49:57.565880
-print(type(date)) #<class 'datetime.datetime'>
-date = date.strftime("%m%d_%H%M")
-print(date) #0726_1654
-print(type(date)) #<class 'str'>
 
-
-path = 'C:\\프로그램\\ai5\\_save\\keras52\\'
-filename ='{epoch:04d}-{loss:.4f}.hdf5'   #1000-0.7777.hdf5
-filepath = "".join([path, 'k52_02', date, '_' , filename])
-#생성 예 : ./_save/keras29_mcp/k29_0726_1654_1000-0.7777.hdf5
-################## mcp 세이브 파일명 만들기 끝 ################### 
-
-mcp=ModelCheckpoint(
-    monitor='loss',
-    mode='auto',
-    verbose = 1,
-    save_best_only=True,
-    filepath=filepath)
-
-model.fit(x,y, epochs=1000, batch_size=7, callbacks=[es, mcp])
+model.fit(x,y, epochs=1000, batch_size=7, callbacks=[es])
 #4. 평가, 예측
 results = model.evaluate(x,y)
 print('loss : ', results)
 
-x_pred = np.array([7,8,9,10]).reshape(1,4,1) #[[[8]]]
+x_pred = np.array([[7,3],[8,2],[9,1],[10,0]]).reshape(1,4,2) #[[[8]]]
 #벡터형태 데이터 (3,) -> (1,3,1)
 #스칼라는 행렬아님
 y_pred = model.predict(x_pred)

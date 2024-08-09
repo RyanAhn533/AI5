@@ -55,7 +55,6 @@ x_train, x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][
 print(xy_train[0][0].shape)
 print(xy_train[0][1].shape)
 
-exit()
 # 모델 구성
 model = Sequential()
 
