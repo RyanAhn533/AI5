@@ -27,11 +27,12 @@ from sklearn.model_selection import train_test_split
 import os
 os.environ["TF_GPU_ALLOCATOR"] = "cuda_malloc_async"
 
-path = "C:\\프로그램\\ai5\\_data\\kaggle\\jena\\"
+path = ".\\_data\\kaggle\\jena\\"
 
-a = pd.read_csv(path + 'jena_climate_2009_2016.csv', index_col=0)
-
-a = a.head(420407)
+a3 = pd.read_csv(path + 'jena_climate_2009_2016.csv', index_col=0)
+b4 = a3.tail(144)
+b5 = b4['T (degC)']
+a = a3.head(420407)
 
 
 a1 = a.drop(['T (degC)'], axis=1)
@@ -57,12 +58,11 @@ y= np.delete(y, 0 , axis = 0)
 print(y.shape) #(420263, 144)
 
 b = a.tail(144)
+
 b1 = b.drop(['T (degC)'], axis=1)
 b2 = b['T (degC)']
 
-
-
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3)
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.9, random_state=3)
 
 scaler = StandardScaler()
 x_train = scaler.fit_transform(x_train.reshape(-1, x_train.shape[-1])).reshape(x_train.shape)
@@ -70,31 +70,30 @@ x_test = scaler.transform(x_test.reshape(-1, x_test.shape[-1])).reshape(x_test.s
 
 
 
-
 #2. 모델구성
 model = Sequential()
-model.add(LSTM(64, input_shape=(144,13), return_sequences=True))
-model.add(LSTM(64,))  
-model.add(Flatten())
-model.add(Dense(8,activation='relu'))
+model.add(LSTM(units=64, input_shape=(144,13), return_sequences=True)) # timesteps , features
+model.add(LSTM(128, return_sequences=True)) # timesteps , features
+model.add(LSTM(256))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
 model.add(Dense(144))
-
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
 es = EarlyStopping(
     monitor = 'loss',
     mode = 'min',
     verbose=1,
-    patience=10,
+    patience=20,
     restore_best_weights=True
 )
 import datetime
 date = datetime.datetime.now()
 date = date.strftime('%m%d_%H%M')
 
-path1 = 'C:\\프로그램\\ai5\\_data\\_save\\keras55\\'
-filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
-filepath = ''.join([path1, 'save_model', date, '_', filename])
+path1 = '.\\_save\\keras55\\'
+filename = 'jena_안준영.hdf5'
+filepath = ''.join([path1, filename])
 
 
 mcp = ModelCheckpoint(
@@ -124,17 +123,12 @@ from sklearn.metrics import r2_score, mean_squared_error
 
 def RMSE(y_test, y_pred) : 
     return np.sqrt(mean_squared_error(y_test, y_pred))
-rmse = RMSE(b2, y_pred)
+rmse = RMSE(b5, y_pred)
 #y_predict = 매개변수
 
 print("rmse = ", rmse)
-"""
-sampleSubmission = pd.read_csv(path+'sample_submission_jena', index_col=0)
-sampleSubmission['T (degC)'] = y_pred[0]
-sampleSubmission.to_csv(path + 'jena_climate_predictions.csv', index=False)
 
-"""
 print("rmse = ", rmse)
 sample_submission_csv = pd.read_csv(path + "sample_submission_jena.csv", index_col=0)
 sample_submission_csv['T (degC)'] = y_pred
-sample_submission_csv.to_csv(path + "jena2.csv")
+sample_submission_csv.to_csv(path1 + "jena9.csv")
