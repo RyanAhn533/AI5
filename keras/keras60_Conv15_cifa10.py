@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow.keras.datasets import mnist, fashion_mnist, cifar10
 import pandas as pd
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout
+from tensorflow.keras.layers import Dense, Conv1D, Flatten, Dropout, LSTM
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -23,6 +23,8 @@ print(y_test.shape)
 # (10000, 32, 32, 3)
 # (50000, 1)
 # (10000, 1)
+x_train = x_train.reshape(50000,3072,1)
+x_test = x_test.reshape(10000,3072,1)
 
 x_train = x_train/255.
 x_test = x_test/255.
@@ -47,7 +49,7 @@ y_test = ohe.transform(y_test)
 # plt.imshow(x_train[49999]) #xtrain의 59999번째를 보여주겠다 , 'gray' 색상을 흑백으로 하겠다. 
 # plt.show()
 # print('y_train[49999]의 값 : ', y_train[49999])
-
+"""
 #2. 모델 구성
 model = Sequential()
 model.add(Conv2D(64, (2,2), input_shape = (32, 32, 3),
@@ -68,7 +70,18 @@ model.add(Conv2D(32, (2,2), activation= 'relu',
 model.add(Flatten())
 model.add(Dense(units=16, input_shape = (32, ), activation='relu'))
 model.add(Dense(10, activation='softmax'))
-
+"""
+model = Sequential()
+model.add(Conv1D(filters=10, kernel_size=2, input_shape=(32*32, 3)))
+model.add(Flatten())
+model.add(Dense(512, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dense(2048, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(10))
+model.summary()
 #3. 컴파일 훈련
 model.compile(loss = 'categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
@@ -115,3 +128,6 @@ print('acc : ', acc)
 # padding
 # 로스 :  1.2356504201889038
 # acc :  0.558
+
+# 로스 :  8.059046745300293
+# acc :  0.1

@@ -1,3 +1,4 @@
+#3차원으로 바꿔서 LSTM으로 바꾸
 #배치를 100으로 잡고
 #x, y를 추출해서 모델을 맹그러봐
 #acc 0.99이상
@@ -14,6 +15,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tensorflow.keras.utils import to_categorical
 import time
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, OneHotEncoder
 
 train_datagen = ImageDataGenerator(
     rescale=1/255,
@@ -26,26 +28,60 @@ horizontal_flip=True, #수평 뒤집기
     zoom_range=1.2, #축소 또는 확대
     shear_range=0.7, # 좌표
     fill_mode="nearest", #비율에 맞춰서 채워라
-    
-    )
+)
 
 
 train_datagen = ImageDataGenerator(
     rescale=1./255,)
 path_train = 'C:/프로그램/ai5/_data/image/rps/'
 
-print(type(path_train))
 
 xy_train = train_datagen.flow_from_directory(
     path_train, target_size=(100, 100), 
     batch_size=20000, 
-class_mode='categorical',
+class_mode='sparse',
 
 color_mode='rgb',
 shuffle=True)
 
 
 x_train,x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][1], train_size=0.7, random_state=3)
+
+augment_size = 5000
+randidx = np.random.randint(x_train.shape[0], size = augment_size)
+x_augmented = x_train[randidx].copy()
+y_augmented = y_train[randidx].copy()
+
+x_augmented = x_augmented.reshape(
+                                  x_augmented.shape[0], 
+                                  x_augmented.shape[1], 
+                                  x_augmented.shape[2], 3)
+x_augmented = train_datagen.flow(
+    x_augmented, y_augmented,
+    batch_size=augment_size,
+    shuffle=False,
+).next()[0]
+
+
+x_train = x_train.reshape(1764,100,100,3)
+x_test = x_test.reshape(756,100,100,3)
+
+x_train = np.concatenate((x_train,x_augmented), axis = 0)
+
+y_train = np.concatenate((y_train, y_augmented), axis = 0)
+#np.unique로 y확인
+#(756, 100, 100, 3)
+#(1764, 100, 100, 3)
+"""
+ohe = OneHotEncoder(sparse=True)
+y_train = y_train.reshape(-1, 1)
+y_test = y_test.reshape(-1, 1)
+y_train = ohe.fit_transform(y_train)
+y_test = ohe.transform(y_test)
+"""
+ohe = OneHotEncoder(sparse=False)
+y_train = ohe.fit_transform(y_train.reshape(-1, 1))
+y_test = ohe.transform(y_test.reshape(-1, 1))
 print(x_train.shape)
 print(x_test.shape)
 print(y_train.shape)
@@ -95,7 +131,7 @@ mcp = ModelCheckpoint(
 )
 
 
-model.fit(x_train, y_train, epochs = 100, batch_size = 64, verbose=1, validation_split=0.2, callbacks=[es, mcp],)
+model.fit(x_train, y_train, epochs = 100, batch_size = 16, verbose=1, validation_split=0.2, callbacks=[es, mcp],)
 
 #평가 예측
 loss = model.evaluate(x_test, y_test)

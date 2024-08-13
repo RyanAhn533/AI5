@@ -1,6 +1,6 @@
 from sklearn.datasets import fetch_california_housing
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout
+from tensorflow.keras.layers import Dense, Conv1D, Flatten, Dropout, LSTM
 import sklearn as sk
 from sklearn.datasets import load_boston
 import numpy as np
@@ -74,17 +74,6 @@ scaler = StandardScaler()
 re_train_csv_scaled = scaler.fit_transform(re_train_csv.drop(['Exited'], axis=1))
 re_test_csv_scaled = scaler.transform(re_test_csv)
 
-"""
-MaxAbsScaler
-로스값은 :  0.32643696665763855
-정확도는 :  0.8613021480292059
-R2 스코어 : 0.16241584680842946
-
-RobustScaler
-로스값은 :  0.3278585970401764
-정확도는 :  0.8619080801042203
-R2 스코어 : 0.16607501742088715
-"""
 
 # 데이터프레임으로 변환
 re_train_csv = pd.concat([pd.DataFrame(re_train_csv_scaled), re_train_csv['Exited'].reset_index(drop=True)], axis=1)
@@ -104,27 +93,30 @@ print(re_train_csv.shape)
 print(re_test_csv.shape)
 print(type(x))
 
-x = x.reshape(165034, 10, 1, 1)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=1186, train_size=0.8)
-
+'''
 #모델
 model = Sequential()
-model.add(Conv2D(10, (2,2), input_shape=(10,1,1), 
-                 strides=1,
-                 padding='same')) 
-model.add(Conv2D(filters=64, kernel_size=(2,2),
-                 strides=1,
-                 padding='same')) 
-model.add(Dropout(0.2))
-model.add(Conv2D(32, (2,2),
-                 strides=1,
-                 padding='same'))
-model.add(Flatten()) 
-model.add(Dense(units=32))
-model.add(Dropout(0.2)) 
-model.add(Dense(units=16, input_shape=(32,))) 
-model.add(Dense(1, activation='softmax'))
+model.add(LSTM(10, input_shape=(10, 1))) # timesteps , features
+model.add(Dense(512, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(1))
+'''
+model = Sequential()
+model.add(Conv1D(filters=10, kernel_size=2, input_shape=(10, 1)))
+model.add(Flatten())
+model.add(Dense(512, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dense(2048, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(1))
+model.summary()
+
 #컴파일 훈련
 model.compile(
     loss='mse',
@@ -142,4 +134,8 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_test, y_predict)
 print("r2스코어는? ", r2)
 
+# 로스는 ? 0.7905293107032776
+# r2스코어는?  -3.7739369395429554
 
+# 로스는 ? 0.10489336401224136
+# r2스코어는?  0.3665581715794918

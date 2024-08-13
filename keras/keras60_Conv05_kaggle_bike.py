@@ -1,6 +1,6 @@
 from sklearn.datasets import fetch_california_housing
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout
+from tensorflow.keras.layers import Dense, Conv1D, Flatten, Dropout, LSTM
 import sklearn as sk
 import numpy as np
 import time as t
@@ -39,31 +39,31 @@ y = train_csv[['count']] #, 'registered
 from sklearn.preprocessing import MinMaxScaler, StandardScaler,MaxAbsScaler, RobustScaler
 
 scaler = StandardScaler()
-x = scaler.fit_transform(x)
-print(x.shape)
-x = x.reshape(10886,5,2,1)
-print(x.shape)
+
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8,
                                                     shuffle=True, random_state=3)
-
+'''
 #모델
 model = Sequential()
-model.add(Conv2D(10, (2,2), input_shape=(5,2,1), 
-                 strides=1,
-                 padding='same')) 
-model.add(Conv2D(filters=64, kernel_size=(2,2),
-                 strides=1,
-                 padding='same')) 
-model.add(Dropout(0.2))
-model.add(Conv2D(32, (2,2),
-                 strides=1,
-                 padding='same'))
-model.add(Flatten()) 
-model.add(Dense(units=32))
-model.add(Dropout(0.2)) 
-model.add(Dense(units=16, input_shape=(32,))) 
-model.add(Dense(1, activation='softmax'))
+model.add(LSTM(10, input_shape=(10, 1))) # timesteps , features
+model.add(Dense(512, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(1))
+'''
+model = Sequential()
+model.add(Conv1D(filters=10, kernel_size=2, input_shape=(10, 1)))
+model.add(Flatten())
+model.add(Dense(512, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dense(2048, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(1))
+model.summary()
 
 #3. 컴파일, 훈련
 model.compile(optimizer='adam',
@@ -77,8 +77,8 @@ model.fit(x_train, y_train, epochs=100, batch_size=128, verbose=1, validation_sp
 loss = model.evaluate(x_test, y_test)
 y_predict = model.predict(x_test)
 
-y_test = np.argmax(y_test, axis=1).reshape(-1, 1)
-y_predict = np.argmax(y_predict, axis=1).reshape(-1, 1)
+y_test = np.argmax(y_test, axis=1)
+y_predict = np.argmax(y_predict, axis=1)
 
 acc = accuracy_score(y_test, y_predict)
 
@@ -89,3 +89,6 @@ print('acc : ', acc)
 #전 ㄱ2 0.9699 로스 0.11
 #Standard  로스는 ? 7.754250526428223
 #r2스코어는?  0.9997607093510704
+
+#로스 :  38.49635696411133
+# acc :  1.0

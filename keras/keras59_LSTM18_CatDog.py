@@ -52,6 +52,9 @@ x_train,x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][1
 
 print(xy_train[0][0].shape)
 print(xy_train[0][1].shape)
+
+x_train = x_train.reshape(13997,100*100,3)
+
 '''
 #2. 모델 구성
 input1 = Input(shape=(100,100,3))
@@ -66,8 +69,9 @@ dense5 = Dense(32, activation='relu')(Flat1)
 output1 = Dense(1, activation='sigmoid')(dense5)
 model = Model(inputs = input1, outputs = output1)
 '''
+
 model = Sequential()
-model.add(LSTM(10, input_shape=(30000, 1))) # timesteps , features
+model.add(LSTM(10, input_shape=(10000, 3))) # timesteps , features
 model.add(Dense(512, activation='relu'))
 model.add(Dropout(0.2))
 model.add(Dense(512, activation='relu'))

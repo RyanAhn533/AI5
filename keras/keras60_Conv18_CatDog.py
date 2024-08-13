@@ -7,7 +7,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.datasets import mnist, fashion_mnist, cifar10
 import pandas as pd
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, Input, MaxPooling2D
+from tensorflow.keras.layers import Dense, Conv1D, Flatten, Dropout, Input, MaxPooling2D, LSTM
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -52,7 +52,7 @@ x_train,x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][1
 
 print(xy_train[0][0].shape)
 print(xy_train[0][1].shape)
-
+'''
 #2. 모델 구성
 input1 = Input(shape=(100,100,3))
 dense1 = Conv2D(128, (2,2), padding ='same', activation='relu')(input1)
@@ -65,6 +65,18 @@ Flat1 = Flatten()(dense4)
 dense5 = Dense(32, activation='relu')(Flat1)
 output1 = Dense(1, activation='sigmoid')(dense5)
 model = Model(inputs = input1, outputs = output1)
+'''
+model = Sequential()
+model.add(Conv1D(filters=10, kernel_size=2, input_shape=(30000, 1)))
+model.add(Flatten())
+model.add(Dense(512, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dense(2048, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(1))
+model.summary()
 
 #3. 컴파일 훈련
 model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics=['accuracy'])

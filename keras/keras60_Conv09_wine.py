@@ -1,6 +1,6 @@
 from sklearn.datasets import fetch_california_housing
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout
+from tensorflow.keras.layers import Dense, Conv1D, Flatten, Dropout, LSTM
 import sklearn as sk
 from sklearn.datasets import load_wine
 import numpy as np
@@ -30,20 +30,14 @@ x = scaler.fit_transform(x)
 
 print(x.shape)
 print(y.shape)
-x = x.reshape(178,13,1,1)
+
+# x = x.reshape(178,13,1,1)
 
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=138, shuffle=True)
 from sklearn.preprocessing import MinMaxScaler, StandardScaler,MaxAbsScaler, RobustScaler
 
-
 """
-MaxAbsScaler
-acc_score : ' 0.9629629629629629
-RobustScaler
-acc_score : ' 1.0
-"""
-
 #모델
 model = Sequential()
 model.add(Conv2D(10, (2,2), input_shape=(13,1,1),
@@ -61,6 +55,28 @@ model.add(Dense(units=32))
 model.add(Dropout(0.2)) 
 model.add(Dense(units=16, input_shape=(32,))) 
 model.add(Dense(1, activation='softmax'))
+
+
+model = Sequential()
+model.add(LSTM(10, input_shape=(13, 1))) # timesteps , features
+model.add(Dense(512, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(1))
+"""
+model = Sequential()
+model.add(Conv1D(filters=10, kernel_size=2, input_shape=(13, 1)))
+model.add(Flatten())
+model.add(Dense(512, activation='relu'))
+model.add(Dense(1024, activation='relu'))
+model.add(Dense(2048, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(1))
+model.summary()
+
 #컴파일 훈련
 model.compile(
     loss='mse',
@@ -77,3 +93,9 @@ print("로스는 ?", loss)
 y_predict = model.predict(x_test)
 r2 = r2_score(y_test, y_predict)
 print("r2스코어는? ", r2)
+
+#로스는 ? 0.5925925970077515
+# r2스코어는?  -0.038461538461538325
+
+# 로스는 ? 0.07431574165821075
+# r2스코어는?  0.869768817923948
