@@ -97,8 +97,8 @@ drop2 = Dropout(0.2)(dense7)
 dense8 = Dense(16, activation='relu')(drop2)
 output1 = Dense(10, activation='softmax')(dense8)
 model = Model(inputs = input1, outputs = output1)
-
-
+model.summary()
+exit()
 #3 컴파일, 훈련
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc'])
 

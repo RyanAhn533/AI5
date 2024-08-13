@@ -2,7 +2,6 @@ from sklearn.datasets import fetch_california_housing
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout
 import sklearn as sk
-from sklearn.datasets import load_boston
 import numpy as np
 import time as t
 from sklearn.model_selection import train_test_split
@@ -21,38 +20,36 @@ from tensorflow.keras import datasets, layers, models
 import matplotlib.pyplot as plt
 ###############
 
-dataset = fetch_california_housing()
-print(dataset)
-print(dataset.DESCR)
-print(dataset.feature_names)
+path = 'C:\\프로그램\\ai5\\_data\\bike-sharing-demand\\'
+# \a  \b 이런걸 하나의 문자로 인식함 줄바꿈 이런거
+# # 위와같은 애들 \ -> \\로 바꿔줘야함 / // 도 가능
+# path = 'C:/프로그램//ai5\_data\\bike-sharing-demand'
 
-x = dataset.data
-y = dataset.target
+train_csv = pd.read_csv(path + "train.csv", index_col=0)
+test_csv = pd.read_csv(path + "test.csv", index_col=0)
+sampleSubmission_csv = pd.read_csv(path + "sampleSubmission.csv", index_col=0)
 
-scaler = MinMaxScaler()
+train_csv = train_csv.dropna() #train_csv 데이터에서 결측치 삭제
+test_csv = test_csv.fillna(test_csv.mean()) #test_csv에는 결측치 평균으로 넣기
+
+x = train_csv.drop(['count'], axis = 1)
+y = train_csv[['count']] #, 'registered
+
+
+from sklearn.preprocessing import MinMaxScaler, StandardScaler,MaxAbsScaler, RobustScaler
+
+scaler = StandardScaler()
 x = scaler.fit_transform(x)
-
 print(x.shape)
-print(y.shape)
-
-#(20640, 8)
-#(20640,)
-x = x.reshape(20640, 2, 2, 2)
-y = y.reshape(20640,1,1,1)
-
+x = x.reshape(10886,5,2,1)
+print(x.shape)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.8,
                                                     shuffle=True, random_state=3)
 
-from sklearn.preprocessing import MinMaxScaler, StandardScaler,MaxAbsScaler, RobustScaler
-#scaler = MaxAbsScaler()
-#scaler = StandardScaler()
-
-#scaler = MaxAbsScaler() 0.61 r2 0.49
-#scaler = RobustScaler() r2 0.304  loss 0.91951
 #모델
 model = Sequential()
-model.add(Conv2D(10, (2,2), input_shape=(2,2,2), 
+model.add(Conv2D(10, (2,2), input_shape=(5,2,1), 
                  strides=1,
                  padding='same')) 
 model.add(Conv2D(filters=64, kernel_size=(2,2),
@@ -68,13 +65,12 @@ model.add(Dropout(0.2))
 model.add(Dense(units=16, input_shape=(32,))) 
 model.add(Dense(1, activation='softmax'))
 
-
 #3. 컴파일, 훈련
 model.compile(optimizer='adam',
               loss='mse', metrics=['acc'])
 
 es= EarlyStopping(monitor='val_loss', mode = 'min', patience=20, restore_best_weights=True)
-model.fit(x_train, y_train, epochs=10, batch_size=128, verbose=1, validation_split=0.2, callbacks=[es])
+model.fit(x_train, y_train, epochs=100, batch_size=128, verbose=1, validation_split=0.2, callbacks=[es])
 
 #4 평가 예측
 
@@ -89,20 +85,7 @@ acc = accuracy_score(y_test, y_predict)
 print('로스 : ', loss[0])
 print('acc : ', acc)
 
-#스케일링 전 0.2713
-#스케일링 후 0.7406029396628281
-"""
-
-exit()
-y_submit = model.predict(test_csv)
-samplesubmission_csv['target'] = np.round(y_submit)/10
-samplesubmission_csv.to_csv(path + "santafe_7.csv")
-
-
-로스는 ? [0.2712891101837158, 0.0021802326664328575]
-r2스코어는?  0.7948835567807272
-
-로스는 ? [0.3928057849407196, 0.0021802326664328575]
-r2스코어는?  0.7030072751830784
-Minmax win
-"""
+# 후 r2 0.9999 로스 0.31
+#전 ㄱ2 0.9699 로스 0.11
+#Standard  로스는 ? 7.754250526428223
+#r2스코어는?  0.9997607093510704

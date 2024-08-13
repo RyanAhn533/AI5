@@ -42,7 +42,7 @@ model.add(Dense(1, activation='sigmoid'))
 es = EarlyStopping(monitor = 'val_loss', mode = 'min', patience=100, restore_best_weights=True)
 model.compile(loss = 'binary_crossentropy', optimizer='adam', metrics=['acc'])
 start = t.time()
-model.fit(x_train, y_train, epochs=1000, batch_size = 8, verbose=1, 
+model.fit(x_train, y_train, epochs=100, batch_size = 8, verbose=1, 
                  validation_split=0.3, callbacks=[es])
 end = t.time()
 
@@ -62,12 +62,14 @@ print('acc_score :', accuracy_score)
 print("걸린 시간 :", round(end-start,2),'초')
 
 y_submit = model.predict(test_csv)
-print("r2스코어 :", r2)
 y_submit = np.round(y_submit,2)
 
 
 sample_submission_csv['Outcome'] = y_submit
 sample_submission_csv.to_csv(path + "submission_0722_8.csv")
-
-
-
+"""
+r2값은? 0.11809434581836775
+acc_score : 0.7099236641221374
+걸린 시간 : 23.11 초
+r2스코어 : 0.11809434581836775
+"""

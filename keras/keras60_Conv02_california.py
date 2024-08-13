@@ -68,13 +68,12 @@ model.add(Dropout(0.2))
 model.add(Dense(units=16, input_shape=(32,))) 
 model.add(Dense(1, activation='softmax'))
 
-
 #3. 컴파일, 훈련
 model.compile(optimizer='adam',
               loss='mse', metrics=['acc'])
 
 es= EarlyStopping(monitor='val_loss', mode = 'min', patience=20, restore_best_weights=True)
-model.fit(x_train, y_train, epochs=10, batch_size=128, verbose=1, validation_split=0.2, callbacks=[es])
+model.fit(x_train, y_train, epochs=100, batch_size=128, verbose=1, validation_split=0.2, callbacks=[es])
 
 #4 평가 예측
 
