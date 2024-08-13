@@ -6,7 +6,7 @@ import numpy as np
 from tensorflow.keras.datasets import mnist
 import pandas as pd
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, LSTM
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tensorflow.keras.utils import to_categorical
@@ -20,62 +20,17 @@ import time
 x_train = x_train/255.
 x_test = x_test/255.
 
-x_train = x_train.reshape(60000, 28, 28, 1)
-x_test = x_test.reshape(10000, 28, 28, 1)
+x_train = x_train.reshape(60000, 784, 1)
+x_test = x_test.reshape(10000, 784, 1)
 
 print(x_train.shape)
 
-###원핫 
-# y_train = to_categorical(y_train)
-# y_test = to_categorical(y_test)
-
-##원핫 1-1
-# from sklearn.preprocessing import OneHotEncoder
-# ohe = OneHotEncoder(sparse=False)
-# y_train = y_train.reshape(-1, 1)
-# y_test = y_test.reshape(-1, 1)
-# y_train = ohe.fit_transform(y_train)
-# y_test = ohe.transform(y_test)
-
-###원핫 1-2
 y_train = pd.get_dummies(y_train)
 y_test = pd.get_dummies(y_test)
 
 y_test = y_test.to_numpy()
 
-# print(np.max(x_train), np.min(x_train)) #1.0 0.0
-# print(y_train.shape)
-
-
-###### 스케일링 1-2 
-# x_train = (x_train - 127.5) / 127.5
-# x_test = (x_test - 127.5) / 127.5
-# print(np.max(x_test), np.min(x_test)) # 1.0 -1.0
-
-# ##### 스케일링 2. MinMaxScaler(), StandardScaler
-# x_train = x_train.reshape(60000, 28*28)
-# x_test = x_test.reshape(10000, 28*28)
-
-# scaler = MinMaxScaler()
-# x_train = scaler.fit_transform(x_train)
-# x_test = scaler.transform(x_test)
-# print(np.max(x_train), np.min(x_train))
-
-
-
-
-# x_train = x_train.reshape(60000, 28, 28, 1)
-# x_test = x_test.reshape(10000, 28, 28, 1)
-# y_train = pd.get_dummies(y_train)
-# y_test = pd.get_dummies(y_test)
- 
-
-# print(x_train[0])
-# print("y_train[0] : ", y_train[0])
-
-# print(x_train.shape, y_train.shape) #(60000, 28, 28) (60000,) #색상 값이 숨겨져있다. 사실은 60000, 28, 28, 1
-# print(x_test.shape, y_test.shape) #(10000, 28, 28) (10000,) 
-
+'''
 
 #2 모델구성
 
@@ -95,8 +50,14 @@ model.add(Dense(units=32))
 model.add(Dropout(0.2)) 
 model.add(Dense(units=16, input_shape=(32,))) 
 model.add(Dense(10, activation='softmax')) #y는 60000,10 으로 onehot encoding해야한다
-
-
+'''
+model = Sequential()
+model.add(LSTM(10, input_shape=(784, 1))) # timesteps , features
+model.add(Dense(512, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(10))
 
 
 model.summary() #summary가 됨. 
@@ -170,3 +131,5 @@ print(y_predict[0])
 # padding
 # 로스 :  [0.2835237383842468, 0.9211999773979187]
 # acc_score : 0.9212
+#로스 :  [11.376164436340332, 0.0957999974489212]
+#acc_score : 0.0958

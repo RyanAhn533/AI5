@@ -1,6 +1,6 @@
 from sklearn.datasets import fetch_california_housing
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout,LSTM
 import sklearn as sk
 from sklearn.datasets import load_digits
 import numpy as np
@@ -32,14 +32,13 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler,MaxAbsScaler, Rob
 scaler = StandardScaler()
 x = scaler.fit_transform(x)
 
-x = x.reshape(1797,16,2,2)
 
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, shuffle=True, random_state=3)
 
 
 
-
+"""
 #모델
 model = Sequential()
 model.add(Conv2D    (10, (2,2), input_shape=(16,2,2), 
@@ -57,6 +56,15 @@ model.add(Dense(units=32))
 model.add(Dropout(0.2)) 
 model.add(Dense(units=16, input_shape=(32,))) 
 model.add(Dense(1, activation='softmax'))
+"""
+model = Sequential()
+model.add(LSTM(10, input_shape=(64, 1))) # timesteps , features
+model.add(Dense(512, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(1))
+
 #컴파일 훈련
 model.compile(
     loss='mse',
@@ -76,3 +84,8 @@ print("r2스코어는? ", r2)
 
 
 
+#로스는 ? 19.13888931274414
+#r2스코어는?  -1.2964067852403534/
+
+#로스는 ? 3.2718265056610107
+#r2스코어는?  0.60742523359162

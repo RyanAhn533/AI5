@@ -2,7 +2,7 @@ import numpy as np
 from tensorflow.keras.datasets import mnist, fashion_mnist
 import pandas as pd
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, LSTM
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -21,8 +21,8 @@ print(y_test.shape)
 x_train = x_train/255.
 x_test = x_test/255.
 
-x_train = x_train.reshape(60000, 28, 28, 1)
-x_test = x_test.reshape(10000, 28, 28, 1)
+x_train = x_train.reshape(60000, 784, 1)
+x_test = x_test.reshape(10000, 784, 1)
 
 y_train = pd.get_dummies(y_train)
 y_test = pd.get_dummies(y_test)
@@ -30,7 +30,7 @@ y_test = pd.get_dummies(y_test)
 y_test = y_test.to_numpy()
 
 #2 모델 구성
-
+'''
 model = Sequential()
 model.add(Conv2D(64, (2,2), activation='relu', input_shape = (28,28,1,),
                  strides=1,
@@ -46,7 +46,14 @@ model.add(Dropout(0.2))
 model.add(Flatten())
 model.add(Dense(units=16, input_shape=(32,), activation='relu')) 
 model.add(Dense(10, activation='softmax'))
-
+'''
+model = Sequential()
+model.add(LSTM(10, input_shape=(784, 1))) # timesteps , features
+model.add(Dense(512, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(10, activation='softmax'))
 #3 컴파일 훈련
 
 model.compile(loss = 'categorical_crossentropy', optimizer = 'adam', metrics=['accuracy'])
