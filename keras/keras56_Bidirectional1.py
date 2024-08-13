@@ -39,12 +39,18 @@ print(x.shape)
 
 #2. 모델구성
 #RNN SimpleRNN LSTM
+# 시작이 대문자면 class 아니면 함수 Sequential = 함수
+#Rapping class -> 왔다갔다 하는 애들
+# RNN 모델을 랩핑한다
 model = Sequential()
-model.add(Bidirectional())
-model.add(GRU(8, input_shape=(3,1))) #3은 time steps, 1은 features
+model.add(Bidirectional(GRU(units=10), input_shape=(3,1))) #Bidirection 에 GRU rapping 한거 
 model.add(Dense(7))
 model.add(Dense(1))
 
+model.summary()
+#GRU Bi 780 GRU
+#240
+exit()
 #3. 컴파일, 훈련
 model.compile(loss='mse', optimizer='adam')
 es = EarlyStopping(
@@ -67,3 +73,9 @@ x_pred = np.array([8,9,10]).reshape(1,3,1) #[[[8]]]
 #스칼라는 행렬아님
 y_pred = model.predict(x_pred)
 print('[8,9,10]의 결과', y_pred)
+
+"""
+loss :  0.149795264005661
+[8,9,10]의 결과 [[9.119955]]
+PS C:\프로그램\ai5> 
+"""
