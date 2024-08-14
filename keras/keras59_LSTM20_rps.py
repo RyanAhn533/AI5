@@ -86,6 +86,8 @@ print(x_train.shape)
 print(x_test.shape)
 print(y_train.shape)
 print(y_test.shape)
+x_train = x_train.reshape(6764,10000,3)
+x_test = x_test.reshape(756,10000,3)
 
 #2. 모델 구성
 model = Sequential()
@@ -130,7 +132,7 @@ mcp = ModelCheckpoint(
 )
 
 
-model.fit(x_train, y_train, epochs = 100, batch_size = 16, verbose=1, validation_split=0.2, callbacks=[es, mcp],)
+model.fit(x_train, y_train, epochs = 10, batch_size = 512, verbose=1, validation_split=0.2, callbacks=[es, mcp],)
 
 #평가 예측
 loss = model.evaluate(x_test, y_test)

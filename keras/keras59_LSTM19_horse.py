@@ -47,8 +47,12 @@ shuffle=True)
 x_train,x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][1], train_size=0.7, random_state=3)
 
 
-print(xy_train[0][0].shape)
-print(xy_train[0][1].shape)
+print(x_train.shape)
+print(x_test.shape)
+
+x_train = x_train.reshape(718,100*100,3)
+x_test = x_test.reshape(309,100*100,3)
+
 '''
 #2. 모델 구성
 input1 = Input(shape=(100,100,3))
@@ -64,7 +68,7 @@ output1 = Dense(1, activation='sigmoid')(dense5)
 model = Model(inputs = input1, outputs = output1)
 '''
 model = Sequential()
-model.add(LSTM(10, input_shape=(30000, 1))) # timesteps , features
+model.add(LSTM(10, input_shape=(10000, 3))) # timesteps , features
 model.add(Dense(512, activation='relu'))
 model.add(Dropout(0.2))
 model.add(Dense(512, activation='relu'))
@@ -120,3 +124,5 @@ print('acc : ', acc)
 
 #로스 :  0.5409650802612305
 #acc :  0.7265
+#로스 :  7.987028121948242
+#acc :  0.48220064724919093

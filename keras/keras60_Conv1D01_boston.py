@@ -47,3 +47,6 @@ y_predict = model.predict(x_test)
 r2 = r2_score(y_test, y_predict)
 print("로스 :", loss)
 print("R2 스코어:", r2)
+
+# 로스 : 7.02468204498291
+# R2 스코어: 0.9151145015618262

@@ -23,8 +23,8 @@ print(y_test.shape)
 # (10000, 32, 32, 3)
 # (50000, 1)
 # (10000, 1)
-x_train = x_train.reshape(50000,3072,1)
-x_test = x_test.reshape(10000,3072,1)
+x_train = x_train.reshape(50000,1024,3)
+x_test = x_test.reshape(10000,1024,3)
 
 x_train = x_train/255.
 x_test = x_test/255.
