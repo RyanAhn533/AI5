@@ -8,7 +8,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.datasets import mnist, fashion_mnist, cifar10
 import pandas as pd
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, Input, MaxPooling2D
+from tensorflow.keras.layers import Dense, Conv1D, Flatten,LSTM, Dropout, Input, MaxPooling2D
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -31,44 +31,21 @@ horizontal_flip=True, #수평 뒤집기
 )
 
 
-train_datagen = ImageDataGenerator(
-    rescale=1./255,)
-path_train = 'C:/프로그램/ai5/_data/image/rps/'
+np_path = 'C:/프로그램/ai5/_data/image/rps/'
 
+x_train = np.load(np_path + "keras45_03_x_train.npy")
+y_train = np.load(np_path + "keras45_03_y_train.npy")
+x_test = np.load(np_path + "keras45_03_x_test.npy")
+y_test = np.load(np_path + "keras45_03_y_test.npy")
+print(x_train.shape)
+print(x_test.shape)
+#(2520, 100, 100, 3)
+#(2520, 100, 100, 3)
 
-xy_train = train_datagen.flow_from_directory(
-    path_train, target_size=(100, 100), 
-    batch_size=20000, 
-class_mode='sparse',
+x_train = x_train.reshape(2520,100*100,3)
+x_test = x_test.reshape(2520,100*100,3)
 
-color_mode='rgb',
-shuffle=True)
-
-
-x_train,x_test, y_train, y_test = train_test_split(xy_train[0][0], xy_train[0][1], train_size=0.7, random_state=3)
-
-augment_size = 5000
-randidx = np.random.randint(x_train.shape[0], size = augment_size)
-x_augmented = x_train[randidx].copy()
-y_augmented = y_train[randidx].copy()
-
-x_augmented = x_augmented.reshape(
-                                  x_augmented.shape[0], 
-                                  x_augmented.shape[1], 
-                                  x_augmented.shape[2], 3)
-x_augmented = train_datagen.flow(
-    x_augmented, y_augmented,
-    batch_size=augment_size,
-    shuffle=False,
-).next()[0]
-
-
-x_train = x_train.reshape(1764,100,100,3)
-x_test = x_test.reshape(756,100,100,3)
-
-x_train = np.concatenate((x_train,x_augmented), axis = 0)
-
-y_train = np.concatenate((y_train, y_augmented), axis = 0)
+x_train, x_test,y_train, y_test = train_test_split(x_train, x_test, train_size=0.8, random_state=3) 
 #np.unique로 y확인
 #(756, 100, 100, 3)
 #(1764, 100, 100, 3)
@@ -80,26 +57,36 @@ y_train = ohe.fit_transform(y_train)
 y_test = ohe.transform(y_test)
 """
 ohe = OneHotEncoder(sparse=False)
-y_train = ohe.fit_transform(y_train.reshape(-1, 1))
-y_test = ohe.transform(y_test.reshape(-1, 1))
+y_train = ohe.fit_transform(y_train)
+y_test = ohe.transform(y_test)
 print(x_train.shape)
 print(x_test.shape)
 print(y_train.shape)
 print(y_test.shape)
 
 #2. 모델 구성
-input1 = Input(shape=(100,100,3))
-dense1 = Conv2D(128, (2,2), padding ='same', activation='relu')(input1)
+model = Sequential()
+model.add(Conv1D(10, kernel_size=2, input_shape=(100*100, 3))) # timesteps , features
+model.add(Dense(64, activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(32, activation='relu'))
+model.add(Flatten())
+model.add(Dense(32, activation='relu'))
+model.add(Dense(3, activation='softmax'))
+"""
+#2. 모델 구성
+input1 = Input(shape=(100*100,3))
+dense1 = Conv1D(128, (2,2), padding ='same', activation='relu')(input1)
 drop1 = Dropout(0.2)(dense1)
-dense2 = Conv2D(64, (2,2), padding='same', activation='relu')(drop1)
+dense2 = Conv1D(64, (2,2), padding='same', activation='relu')(drop1)
 maxp1 = MaxPooling2D()(dense2)
-dense3 = Conv2D(32, (2,2), padding='same', activation='relu')(maxp1)
-dense4 = Conv2D(32, (2,2), padding='same', activation='relu')(dense3)
+dense3 = Conv1D(32, (2,2), padding='same', activation='relu')(maxp1)
+dense4 = Conv1D(32, (2,2), padding='same', activation='relu')(dense3)
 Flat1 = Flatten()(dense4)
 dense5 = Dense(32, activation='relu')(Flat1)
 output1 = Dense(3, activation='softmax')(dense5)
 model = Model(inputs = input1, outputs = output1)
-
+"""
 #3. 컴파일 훈련
 model.compile(loss = 'categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
@@ -131,7 +118,7 @@ mcp = ModelCheckpoint(
 )
 
 
-model.fit(x_train, y_train, epochs = 100, batch_size = 16, verbose=1, validation_split=0.2, callbacks=[es, mcp],)
+model.fit(x_train, y_train, epochs = 10, batch_size = 16, verbose=1, validation_split=0.2, callbacks=[es, mcp],)
 
 #평가 예측
 loss = model.evaluate(x_test, y_test)
@@ -144,6 +131,6 @@ acc = accuracy_score(y_test, np.round(y_predict))
 
 print('로스 : ', loss[0])
 print('acc : ', acc)
-
 #로스 :  0.5409650802612305
 #acc :  0.7265
+#로스 :  1.0989115238189697/

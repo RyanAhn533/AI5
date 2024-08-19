@@ -1,17 +1,10 @@
+# jena를 Dnn으로 구성
+# x : (42만, 144, 144) -> 42만, (144*144)
+# y " (42만, 144)"
+
 #https://www.kaggle.com/datasets/stytch16/jena-climate-2009-2016
 
-#y 는 T(degC) 로 잡아라.
-#자르는 거 맘대로
-
-#predict해야할 부분
-#31.12.2016 00:10:00 ~ 01.01.2017 00:00:00 까지 맞춰라 y 144개
-#None , 144
-#y의 shape는 (n,144)
-
-#url : https://www.kaggle.com/competitions/santander-customer-transaction-prediction/data?select=test.csv
-print(range(100))
-
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense, SimpleRNN, LSTM, GRU
 
 import numpy as np
@@ -29,11 +22,12 @@ from sklearn.model_selection import train_test_split
 import os
 os.environ["TF_GPU_ALLOCATOR"] = "cuda_malloc_async"
 
-path = "C:\\프로그램\\ai5\\_data\\kaggle\\jena\\"
+path = ".\\_data\\kaggle\\jena\\"
 
-a = pd.read_csv(path + 'jena_climate_2009_2016.csv', index_col=0)
-
-a = a.head(420407)
+a3 = pd.read_csv(path + 'jena_climate_2009_2016.csv', index_col=0)
+b4 = a3.tail(144)
+b5 = b4['T (degC)']
+a = a3.head(420407)
 
 
 a1 = a.drop(['T (degC)'], axis=1)
@@ -57,28 +51,29 @@ print(x.shape) #(420263, 144, 13)
 y= np.delete(y, 0 , axis = 0)
 # print("y변환 : ",y[0])
 print(y.shape) #(420263, 144)
-
+x = x.reshape(420263,144*13)
 b = a.tail(144)
+
 b1 = b.drop(['T (degC)'], axis=1)
 b2 = b['T (degC)']
 
-
-
-x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3)
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.9, random_state=5656)
 
 scaler = StandardScaler()
-x_train = scaler.fit_transform(x_train.reshape(-1, x_train.shape[-1])).reshape(x_train.shape)
-x_test = scaler.transform(x_test.reshape(-1, x_test.shape[-1])).reshape(x_test.shape) 
-
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test) 
 
 
 
 #2. 모델구성
 model = Sequential()
-model.add(LSTM(64, input_shape=(144,13), return_sequences=True))
-model.add(LSTM(64,))  
-model.add(Flatten())
-model.add(Dense(8,activation='relu'))
+model.add(Dense(64, input_shape=(144*13,))) # timesteps , features
+model.add(Dense(128, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(512, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
+model.add(Dense(256, activation='relu'))
 model.add(Dense(144))
 
 #3. 컴파일, 훈련
@@ -87,16 +82,16 @@ es = EarlyStopping(
     monitor = 'loss',
     mode = 'min',
     verbose=1,
-    patience=10,
+    patience=30,
     restore_best_weights=True
 )
 import datetime
 date = datetime.datetime.now()
 date = date.strftime('%m%d_%H%M')
 
-path1 = 'C:\\프로그램\\ai5\\_data\\_save\\keras55\\'
-filename = '{epoch:04d}-{val_loss:.4f}.hdf5'
-filepath = ''.join([path1, 'save_model', date, '_', filename])
+path1 = '.\\_save\\keras55\\'
+filename = 'jena_안준영.hdf5'
+filepath = ''.join([path1, 'save_model', filename])
 
 
 mcp = ModelCheckpoint(
@@ -106,16 +101,18 @@ mcp = ModelCheckpoint(
     save_best_only= True,
     filepath = filepath
 )
-model.fit(x,y, epochs=200, validation_split=0.2, batch_size=512, callbacks=[es,mcp])
+model.fit(x,y, epochs=1000, validation_split=0.2, batch_size=1024, callbacks=[es,mcp])
+
+
 #4. 평가, 예측
-results = model.evaluate(x,y, batch_size=512)
+results = model.evaluate(x,y, batch_size=1024)
 print('loss : ', results)
 
-x_pred = np.array([b1]).reshape(1,144,13) #[[[8]]]
+x_pred = np.array([b1]).reshape(1,144*13) #[[[8]]]
 #벡터형태 데이터 (3,) -> (1,3,1)
 #스칼라는 행렬아님
 
-y_pred = model.predict(x_pred, batch_size=512)
+y_pred = model.predict(x_pred, batch_size=1024)
 y_pred = np.array([y_pred]).reshape(144,1)
 print(' 결과', y_pred)
 print(y_pred.shape)
@@ -126,17 +123,15 @@ from sklearn.metrics import r2_score, mean_squared_error
 
 def RMSE(y_test, y_pred) : 
     return np.sqrt(mean_squared_error(y_test, y_pred))
-rmse = RMSE(b2, y_pred)
-#y_predict = 매개변수
+rmse = RMSE(b5, y_pred)
 
 print("rmse = ", rmse)
-"""
-sampleSubmission = pd.read_csv(path+'sample_submission_jena', index_col=0)
-sampleSubmission['T (degC)'] = y_pred[0]
-sampleSubmission.to_csv(path + 'jena_climate_predictions.csv', index=False)
 
-"""
-print("rmse = ", rmse)
-sample_submission_csv = pd.read_csv(path + "sample_submission_jena.csv", index_col=0)
-sample_submission_csv['T (degC)'] = y_pred
-sample_submission_csv.to_csv(path + "jena2.csv")
+#(144, 1)
+#rmse =  2.7745453146667893
+
+#rmse = 1.711
+#rmse =  1.6803965965776588
+
+#(144, 1)
+#rmse =  1.4031121056311942
