@@ -16,14 +16,10 @@ docs = ['너무 재미있다', '참 최고에요', '참 잘만든 영화예요',
         '추천하고 싶은 영화입니다', '한 번 더 보고 싶어요', '글쎄',
         '별로에요', '생각보다 지루해요', '연기가 어색해요',
         '재미없어요', '너무 재미없다.', '참 재밋네요.',
-        '준영이 바보', '반장 잘생겼다', '태운이 또 구라친다', 
-        "태운이는 피부가 참 좋다.", "준영이는 개쩐다", 
-         "사영이는 옷을 또 사고 또 사영", "선생님은 베트남 미남",
-         "현아랑 누리는 베스트 프렌드", "반장의 키보드 소리는 커서 옆반까지 들린다."]
+        '준영이 바보', '반장 잘생겼다', '태운이 또 구라친다']
 
-
-labels = np.array([1,1,1,1,1,0,0,0,0,0,0,1,0,1,0,1,0,1,1,0,0])
-docs2 = ["태운이 너무 피부가 좋다"]
+labels = np.array([1,1,1,1,1,0,0,0,0,0,0,1,0,1,0])
+docs2 = ["태운이 참 재미없다."]
 token = Tokenizer()
 token.fit_on_texts(docs)
 token.fit_on_texts(docs2)
@@ -38,6 +34,7 @@ print(x_predict)
 [[2, 3], [1, 4], [1, 5, 6], [7, 8, 9], [10, 11, 12, 13, 14],
  [15], [16], [17, 18], [19, 20], [21], [2, 22], [1, 23],
  [24, 25], [26, 27], [28, 29, 30]]'''
+print(type(x))
 
 
 #길이가 맞지 않기 때문에 가장 긴 값을 기준으로 0을 넣어준다
@@ -46,36 +43,38 @@ print(x_predict)
 
 
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-pad_x = pad_sequences(x, maxlen=5, truncating='pre')#padding='pre', 'post', maxlen=5, truncating='pre', 'post')
+pad_x = pad_sequences(x)#padding='pre', 'post', maxlen=5, truncating='pre', 'post')
 x_pred = pad_sequences(x_predict, maxlen=5)#padding='pre', 'post', maxlen=5, truncating='pre', 'post')
 print(x_pred.shape)
 
 print(pad_x)
-print(x_pred)
-
 print(pad_x.shape)
-x_predict = to_categorical(x_pred, num_classes=53)
+print(x_pred.shape)
+print(type(pad_x))
+print(x_pred) 
+
+#(15, 5)
+#(1, 5)
+x_predict = to_categorical(x_pred, num_classes=31)
 # ohe = OneHotEncoder(sparse=False)
 # x_predict = ohe.fit_transform(x_pred)
-# x_ = to_categorical(pad_x)
-# (1, 31,5)
+
+#(1, 31,5)
 ohe = OneHotEncoder(sparse=False)
 x = np.array(pad_x).reshape(-1,1)
 ohe.fit(x)
 x_ = ohe.transform(x)
-print(x.shape)
 print(x_.shape)
-#(105, 51)
-#(1, 5, 58)
-exit()
-x = x_.reshape(21,5,53)
+print(x_predict.shape)
+
+x = x_.reshape(15,5,31)
 
 x_train, x_test, y_train, y_test = train_test_split(x, labels, train_size=0.8, random_state=5656)
 print(x_train.shape, x_test.shape, y_train.shape, y_test.shape)
 #(12, 5) (3, 5) (12,) (3,)
 
 model = Sequential()
-model.add(Conv1D(64, kernel_size=2, input_shape=(5,53)))
+model.add(Conv1D(64, kernel_size=2, input_shape=(5,31)))
 model.add(Flatten())
 model.add(Dense(64, activation='relu'))
 model.add(Dense(128, activation='relu'))

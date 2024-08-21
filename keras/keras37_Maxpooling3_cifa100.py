@@ -28,7 +28,8 @@ y_train = y_train.reshape(-1, 1)
 y_test = y_test.reshape(-1, 1)
 y_train = ohe.fit_transform(y_train)
 y_test = ohe.transform(y_test)
-
+print(x_train.shape,x_test.shape,y_train.shape,y_test.shape)
+exit()
 #2 모델 구성
 model = Sequential()
 model.add(Conv2D(filters = 32, kernel_size=(2,2), activation='relu', input_shape = (32,32,3),
