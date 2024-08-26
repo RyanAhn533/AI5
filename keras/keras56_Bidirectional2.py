@@ -22,7 +22,7 @@ x = np.array([[1,2,3],[2,3,4],[3,4,5],[4,5,6],[5,6,7],[6,7,8],
              [30,40,50],[40,50,60]])
 y = np.array([4,5,6,7,8,9,10,11,12,13,50,60,70])
 x_predict = np.array([50,60,70])
-
+#ㄴㅇ
 x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state=3)
 
 scaler = StandardScaler()
