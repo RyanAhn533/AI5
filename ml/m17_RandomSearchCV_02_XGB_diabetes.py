@@ -78,3 +78,21 @@ y_pred_best = model.best_estimator_.predict(x_test)
 
 print('최적 튠 ACC: ', r2_score(y_test, y_pred_best)) 
 
+'''
+최적의 매개변수 :  XGBRegressor(base_score=None, booster=None, callbacks=None,
+             colsample_bylevel=None, colsample_bynode=None,
+             colsample_bytree=None, device=None, early_stopping_rounds=None,
+             enable_categorical=False, eval_metric=None, feature_types=None,
+             gamma=None, grow_policy=None, importance_type=None,
+             interaction_constraints=None, learning_rate=0.01, max_bin=None,
+             max_cat_threshold=None, max_cat_to_onehot=None,
+             max_delta_step=None, max_depth=6, max_leaves=None,
+             min_child_weight=None, min_sample_leaf=3, missing=nan,
+             monotone_constraints=None, multi_strategy=None, n_estimators=500,
+             n_jobs=-1, num_parallel_tree=None, ...)
+최적의 파라미터 :  {'tree_method': 'gpu_hist', 'subsample': 0.8, 'n_jobs': -1, 'n_estimators': 500, 'min_sample_leaf': 3, 'max_depth': 6, 'learning_rate': 0.01}
+최고의 점수 :  0.3810789160539939
+모델의 점수 :  0.5313370659342695
+r2 :  0.5313370659342695
+최적 튠 ACC:  0.5313370659342695
+'''

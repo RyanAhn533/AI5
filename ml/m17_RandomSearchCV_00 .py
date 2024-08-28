@@ -1,8 +1,3 @@
-
-###########Grid search의 단점!
-#시간!
-
-
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split, KFold
@@ -68,6 +63,18 @@ print('최적 튠 ACC :', accuracy_score(y_test, y_pred_best))
 
 print('걸린시간 : ', round(end_time-start_time, 2), '초')
 #걸린시간 :  1.43 초
-
 import pandas as pd
-print(pd.DataFrame(model.cv_results_).T)
+print(pd.DataFrame(model.cv_results_).sort_values('rank_test_score', ascending=True))
+print(pd.DataFrame(model.cv_results_).columns)
+'''
+Index(['mean_fit_time', 'std_fit_time', 'mean_score_time', 'std_score_time',
+       'param_C', 'param_degree', 'param_kernel', 'param_gamma', 'params',
+       'split0_test_score', 'split1_test_score', 'split2_test_score',
+       'split3_test_score', 'split4_test_score', 'mean_test_score',
+       'std_test_score', 'rank_test_score'],
+      dtype='object')
+'''
+
+path = 'C:\\프로그램\\ai5\\_data\\_save\\m15_GS_CV_01\\'
+print(pd.DataFrame(model.cv_results_).sort_values('rank_test_score', ascending=True)\
+    .to_csv(path + 'm17_randomizer.csv'))
