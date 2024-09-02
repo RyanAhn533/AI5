@@ -23,7 +23,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, shuffle=True,
 n_splits=5
 kfold = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=333)
 
-parametes = [{"C":[1, 10, 100, 100], 'kernel':['linear', 'sigmoid'],
+parametes = [{"C":[1, 10, 100, 1000], 'kernel':['linear', 'sigmoid'],
               'degree':[3,4,5]}, #24
              {'C':[1, 10, 100], 'kernel':['rbf'], 'gamma':[0.001, 0.0001]}, #6,
              {'C':[1, 10, 100, 1000], 'kernel':['sigmoid'], 'gamma':[0.01, 0.001, 0.0001], 'degree':[3,4]} #24
