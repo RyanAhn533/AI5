@@ -72,3 +72,13 @@ for model in models1:
         acc_pca = accuracy_score(y_test, model4.predict(x_test_final))
         
         print(f"ACC Score after removing {percentage}% lowest importance features and applying PCA: {acc_pca}")
+        
+        '''
+        ================= XGBClassifier =================
+Original ACC Score: 0.9444444444444444
+ACC Score after removing 10% lowest importance features and applying PCA: 0.9444444444444444
+ACC Score after removing 20% lowest importance features and applying PCA: 0.9444444444444444
+ACC Score after removing 30% lowest importance features and applying PCA: 0.9444444444444444
+ACC Score after removing 40% lowest importance features and applying PCA: 0.9444444444444444
+ACC Score after removing 50% lowest importance features and applying PCA: 0.9444444444444444
+        '''

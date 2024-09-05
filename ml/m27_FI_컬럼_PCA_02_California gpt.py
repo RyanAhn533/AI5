@@ -24,7 +24,6 @@ model4 = XGBRegressor(random_state=random_state1)
 
 models1 = [ model2]
 
-
 for model in models1:
     model.fit(x_train, y_train)
     feature_importances = model.feature_importances_
@@ -64,3 +63,13 @@ for model in models1:
         
         print(f"R2 Score after removing {percentage}% lowest importance features and applying PCA: {r2_pca}")
 
+'''
+================= list =================
+Original R2 Score: 0.811439104037621
+R2 Score after removing 10% lowest importance features and applying PCA: 0.8384930657222394
+R2 Score after removing 20% lowest importance features and applying PCA: 0.8428355013013149
+R2 Score after removing 30% lowest importance features and applying PCA: 0.8366455706028233
+R2 Score after removing 40% lowest importance features and applying PCA: 0.8345204821592056
+R2 Score after removing 50% lowest importance features and applying PCA: 0.8287332324114531
+PS C:\프로그램\ai5> 
+'''

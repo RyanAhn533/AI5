@@ -71,7 +71,7 @@ for model in models1:
         print(f"R2 Score after removing {percentage}% lowest importance features and applying PCA: {r2_pca}")
 
 '''
-================= list =================
+================= XGBRegressor =================
 Original R2 Score: 0.3687286985683689
 R2 Score after removing 10% lowest importance features and applying PCA: 0.20531206594164297
 R2 Score after removing 20% lowest importance features and applying PCA: 0.16541376440595157

@@ -70,7 +70,7 @@ for model in models1:
         print(f"ACC Score after removing {percentage}% lowest importance features and applying PCA: {acc_pca}")
         
 '''
-================= list =================
+================= XGBClassifier =================
 Original ACC Score: 0.9298245614035088
 ACC Score after removing 10% lowest importance features and applying PCA: 0.9473684210526315
 ACC Score after removing 20% lowest importance features and applying PCA: 0.956140350877193

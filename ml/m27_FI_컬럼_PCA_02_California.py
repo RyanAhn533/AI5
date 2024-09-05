@@ -62,3 +62,4 @@ for model in models:
         r2_pca = r2_score(y_test, model.predict(x_test))
         
         print(f"R2 Score after removing {percentage}% lowest importance features: {r2_pca}")
+
