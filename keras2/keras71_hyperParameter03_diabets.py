@@ -9,6 +9,7 @@ from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 import warnings
 warnings.filterwarnings('ignore')
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.optimizers import Adam
 
 #1. 데이터
 x, y = load_diabetes(return_X_y=True)

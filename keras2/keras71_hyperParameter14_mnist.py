@@ -12,6 +12,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLRO
 import pandas as pd
 from tensorflow.keras.datasets import mnist
 from sklearn.metrics import accuracy_score
+from tensorflow.keras.optimizers import Adam
 
 #1. 데이터
 (x_train, y_train), (x_test, y_test) = mnist.load_data() #알아서 데이터 나눠줌
@@ -112,17 +113,12 @@ print('model.best_score_ :', model.best_score_)
 print('model.score :', model.score(x_test, y_test))
 
 '''
-로스 :  [11.26333236694336, 0.10100000351667404]
-acc_score : 0.101
-[[3]
- [3]
- [3]
- ...
- [3]
- [3]
- [3]]
-(10000, 1)
-[3]
+time : 220.86
+model.best_params_ : {'optimizer': 'adam', 'node5': 32, 'node4': 128, 'node3': 16, 'node2': 64, 'node1': 128, 'lr': 0.1, 'drop': 0.2, 'batch_size': 300, 'activation': 'relu'}
+model.best_estimator_ : <keras.wrappers.scikit_learn.KerasClassifier object at 0x000001E75D78E4C0>
+model.best_score_ : 0.9561500072479248
+34/34 [==============================] - 0s 2ms/step - loss: 0.1192 - acc: 0.9664
+model.score : 0.9664000272750854
 '''
 
 

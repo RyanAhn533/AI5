@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score
 
 #1.데이터
 x_data = np.array([[0,0], [0,1], [1,0], [1,1]])
-y_data = np.array([0,0,0,1])
+y_data = np.array([0,1,1,0])
 print(x_data.shape, y_data.shape)
 
 #모델

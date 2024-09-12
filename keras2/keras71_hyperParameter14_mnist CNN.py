@@ -54,7 +54,7 @@ def build_model(drop=0.5, optimizer='adam', activation='relu',
     return model
 
 def create_hyperparameter():
-    batchs = [100, 200, 300, 400, 500]
+    batchs = [32,16,8,1,64]
     optimizers = ['adam', 'rmsprop', 'adadelta']
     dropouts = [0.2, 0.3, 0.4, 0.5]
     lrs = [0.5, 0.1, 0.01, 0.001]
@@ -113,12 +113,12 @@ print('model.best_score_ :', model.best_score_)
 print('model.score :', model.score(x_test, y_test))
 
 '''
-time : 145.41
-model.best_params_ : {'optimizer': 'adam', 'node5': 64, 'node4': 64, 'node3': 128, 'node2': 128, 'node1': 16, 'lr': 0.01, 'drop': 0.5, 'batch_size': 100, 'activation': 'linear'}
-model.best_estimator_ : <keras.wrappers.scikit_learn.KerasRegressor object at 0x00000181E0DA1D30>
-model.best_score_ : -3479.510546875
-1/1 [==============================] - 0s 12ms/step - loss: 3318.2478 - mae: 46.7181
-model.score : -3318.247802734375
+time : 189.63
+model.best_params_ : {'optimizer': 'adadelta', 'node5': 8, 'node4': 64, 'node3': 64, 'node2': 128, 'node1': 64, 'lr': 0.001, 'drop': 0.2, 'batch_size': 400, 'activation': 'relu'}
+model.best_estimator_ : <keras.wrappers.scikit_learn.KerasClassifier object at 0x000001E5D8A18910>
+model.best_score_ : 0.9607166767120361
+25/25 [==============================] - 0s 2ms/step - loss: 0.1274 - acc: 0.9665
+model.score : 0.9664999842643738
 '''
 
 

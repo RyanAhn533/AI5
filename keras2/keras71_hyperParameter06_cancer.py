@@ -9,6 +9,7 @@ from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 import warnings
 warnings.filterwarnings('ignore')
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+from tensorflow.keras.optimizers import Adam
 
 #1. 데이터
 x, y = load_breast_cancer(return_X_y=True)
@@ -33,7 +34,7 @@ def build_model(drop=0.5, optimizer='adam', activation='relu',
 
     model = Model(inputs=inputs, outputs=outputs)
 
-    model.compile(optimizer=optimizer, metrics=['mae'], loss='binary_crossentropy')
+    model.compile(optimizer=optimizer, metrics=['acc'], loss='binary_crossentropy')
 
 
     return model
@@ -80,7 +81,7 @@ es = EarlyStopping(
     monitor = 'val_loss',
     mode = 'min',
     verbose=1,
-    patience=20,
+    patience=50,
     restore_best_weights=True)
 import time
 start = time.time()
@@ -98,8 +99,12 @@ print('model.best_score_ :', model.best_score_)
 print('model.score :', model.score(x_test, y_test))
 
 '''
-sklearn.utils._param_validation.InvalidParameterError: The 'estimator' parameter of RandomizedSearchCV must be an object implementing 'fit'. Got <function build_model at 0x0000022B3EE6FA60> instead.
-
+time : 130.27
+model.best_params_ : {'optimizer': 'adam', 'node5': 16, 'node4': 16, 'node3': 16, 'node2': 128, 'node1': 64, 'lr': 0.001, 'drop': 0.4, 'batch_size': 100, 'activation': 'linear'}
+model.best_estimator_ : <keras.wrappers.scikit_learn.KerasRegressor object at 0x00000159D8662C10>
+model.best_score_ : -0.24831430315971376
+2/2 [==============================] - 0s 4ms/step - loss: 0.3534 - mae: 0.2199
+model.score : -0.35343465209007263
 '''
 
 
