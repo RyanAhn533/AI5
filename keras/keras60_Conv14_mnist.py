@@ -74,7 +74,7 @@ from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 es = EarlyStopping(
     monitor = 'val_loss',
     mode = 'min',
-    patience = 10,
+    patience = 3,
     verbose = 1,
     restore_best_weights=True
 )
@@ -107,7 +107,7 @@ mcp = ModelCheckpoint(
 
 
 start = time.time()
-hist = model.fit(x_train, y_train, epochs=100, batch_size=128, verbose=1, validation_split = 0.25, callbacks=[es, mcp])
+hist = model.fit(x_train, y_train, epochs=5, batch_size=128, verbose=1, validation_split = 0.25, callbacks=[es, mcp])
 end = time.time()
 
 # model.save('./_save/keras29_mcp/keras29_3_save_model.h5')

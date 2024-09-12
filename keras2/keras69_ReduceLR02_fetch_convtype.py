@@ -70,10 +70,10 @@ rlr = ReduceLROnPlateau(monitor='val_loss', mode = 'auto',
 
 
 from tensorflow.keras.optimizers import Adam
-learning_rate = 0.001 #디폴트 0.001 0.005, 0.0001
+learning_rate = 0.05 #디폴트 0.001 0.005, 0.0001
 #learning late default 0.001
-#learning late default 0.0001
-model.compile(loss='mse', optimizer=Adam(learning_rate=learning_rate))
+#learning late default 0.00c 1
+model.compile(loss='categorical_crossentropy', optimizer=Adam(learning_rate=learning_rate))
 #Adam = 로스를 쳐줄여줌
 model.fit(x_train, y_train,
           validation_split=0.2, epochs=100,

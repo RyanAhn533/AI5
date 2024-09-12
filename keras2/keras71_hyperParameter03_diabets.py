@@ -3,9 +3,12 @@ from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Dropout, Input
-
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from sklearn.model_selection import RandomizedSearchCV
+from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 import warnings
 warnings.filterwarnings('ignore')
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
 #1. 데이터
 x, y = load_diabetes(return_X_y=True)
@@ -16,7 +19,7 @@ print(x_train.shape, y_train.shape)     # (353, 10) (353,)
 
 #2. 모델 구성
 def build_model(drop=0.5, optimizer='adam', activation='relu',
-                node1=128, node2=64, node3=32, node4=16, node5=8, lr=0.001):
+                node1=128, node2=64, node3=32, node4=16, node5=8, lr=0.5):
     inputs = Input(shape=(10, ), name='inputs')
     x = Dense(node1, activation=activation, name='hidden1')(inputs)
     x = Dropout(drop)(x)
@@ -31,13 +34,15 @@ def build_model(drop=0.5, optimizer='adam', activation='relu',
     model = Model(inputs=inputs, outputs=outputs)
 
     model.compile(optimizer=optimizer, metrics=['mae'], loss='mse')
-    
+
+
     return model
 
 def create_hyperparameter():
     batchs = [100, 200, 300, 400, 500]
     optimizers = ['adam', 'rmsprop', 'adadelta']
     dropouts = [0.2, 0.3, 0.4, 0.5]
+    lrs = [0.5, 0.1, 0.01, 0.001]
     activations = ['relu', 'elu', 'selu', 'linear']
     node1 = [128, 64, 32, 16]
     node2 = [128, 64, 32, 16]
@@ -53,6 +58,7 @@ def create_hyperparameter():
             'node3' : node3,
             'node4' : node4,
             'node5' : node5,
+            'lr' : lrs
             }
 
 hyperparameters = create_hyperparameter()
@@ -60,8 +66,6 @@ print(hyperparameters)
 # {'batch_size': [100, 200, 300, 400, 500], 'optimizer': ['adam', 'rmsprop', 'adadelta'], 'drop': [0.2, 0.3, 0.4, 0.5], 'activation': ['relu', 'elu', 'selu', 'linear'], 
 # 'node1': [128, 64, 32, 16], 'node2': [128, 64, 32, 16], 'node3': [128, 64, 32, 16], 'node4': [128, 64, 32, 16], 'node5': [128, 64, 32, 16, 8]}
 
-from sklearn.model_selection import RandomizedSearchCV
-from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 
 Keras_model = KerasRegressor(build_fn=build_model, verbose=1)
 
@@ -72,9 +76,20 @@ model = RandomizedSearchCV(Keras_model, hyperparameters, cv=5,
                            verbose=1,
                            )
 
+es = EarlyStopping(
+    monitor = 'val_loss',
+    mode = 'min',
+    verbose=1,
+    patience=20,
+    restore_best_weights=True)
+
 import time
 start = time.time()
-model.fit(x_train, y_train, epochs=3)
+
+model.fit(x_train, y_train, epochs=100, validation_split=0.2, callbacks=[ReduceLROnPlateau(monitor='val_loss', mode = 'auto', 
+                        patience=5, verbose=1, factor=0.8)#running rate * factor)
+, es])
+
 end = time.time()
 
 print('time :', round(end - start, 2))
