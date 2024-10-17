@@ -17,7 +17,7 @@ sample_submission_csv = pd.read_csv(path + "sample_submission.csv", index_col=0)
 print(train_csv.columns)
 print(test_csv.columns)
 
-
+#(652, 8) (652,)
 x = train_csv.drop(['Outcome'], axis=1)
 y = train_csv['Outcome']
 
