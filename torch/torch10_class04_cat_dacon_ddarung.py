@@ -18,10 +18,8 @@ SEED = 1004
 import random
 random.seed(SEED)   #파이썬 랜덤 고정
 np.random.seed(SEED)   #넘파이 랜덤 고정
-
 ##토치 시드 고정
 torch.manual_seed(SEED)
-
 torch.cuda.manual_seed(SEED)
 
 #1. 데이터
@@ -51,29 +49,11 @@ y_train = torch.FloatTensor(y_train.values).unsqueeze(1).to(DEVICE)
 y_test = torch.FloatTensor(y_test.values).unsqueeze(1).to(DEVICE)
 
 
-
-#y_predict -> vector형태라서 reshape해줘야함
-
-#int - long
-#floattensor - doubletensor
-#longtensor랑 floattensor언제 쓰는지 확인
-
 print("========================")
 print(x_train.shape, x_test.shape) #torch.Size([398, 30]) torch.Size([171, 1, 30])
 print(y_train.shape, y_test.shape) #torch.Size([398]) torch.Size([171, 1])
 print(type(x_train), type(y_train)) #<class 'torch.Tensor'> <class 'torch.Tensor'> 
 
-# #2. 모델구성
-# model = nn.Sequential(
-#     nn.Linear(30, 64),
-#     nn.ReLU(),
-#     nn.Linear(64, 32),
-#     nn.ReLU(),
-#     nn.Linear(32, 16),
-#     nn.ReLU(),
-#     nn.Linear(16, 1),
-#     nn.Sigmoid()    
-# ).to(DEVICE)
 
 class Model(nn.Module):
     def __init__(self, input_dim, output_dim):
@@ -140,6 +120,6 @@ r2 = r2_score(y_test.cpu().numpy(), np.round(result.detach().cpu().numpy()))
 print('r2는?', r2)
 
 '''
-최종 loss :  2627.647705078125
-r2는? 0.5751335620880127
+최종 loss :  2414.812255859375
+r2는? 0.6318292021751404
 '''

@@ -37,18 +37,10 @@ x_train = scaler.fit_transform(x_train)
 x_test = scaler.transform(x_test)
 
 x_train = torch.FloatTensor(x_train).to(DEVICE)
-#x_train = torch.DoubleTensor(x_train).to(DEVICE)
-
 y_train = torch.FloatTensor(y_train).unsqueeze(1).to(DEVICE)
-#y_train = torch.IntTensor(y_train).unsqueeze(1).to(DEVICE)
-#y_train = torch.LongTensor(y_train).unsqueeze(1).to(DEVICE)
+x_test = torch.LongTensor(x_test).to(DEVICE)
+y_test = torch.LongTensor(y_test).unsqueeze(1).to(DEVICE)
 
-x_test = torch.FloatTensor(x_test).to(DEVICE)
-#x_test = torch.DoubleTensor(x_test).unsqueeze(1).to(DEVICE)
-
-y_test = torch.FloatTensor(y_test).unsqueeze(1).to(DEVICE)
-#y_test = torch.IntTensor(y_test).unsqueeze(1).to(DEVICE)
-#y_test = torch.LongTensor(y_test).unsqueeze(1).to(DEVICE)
 
 
 #y_predict -> vector형태라서 reshape해줘야함
@@ -139,6 +131,6 @@ r2 = r2_score(y_test.cpu().numpy(), np.round(result.detach().cpu().numpy()))
 print('r2는?', r2)
 
 '''
-최종 loss :  0.5850924849510193
-acc는? 0.9941520467836257
+최종 loss :  0.3196646571159363
+r2는? 0.7096512317657471
 '''

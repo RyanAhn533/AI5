@@ -82,7 +82,7 @@ class Model(nn.Module):
 model = Model(13, 3).to(DEVICE)
 
 #3. 컴파일, 훈련
-criterion = nn.MSELoss()  # 회귀 문제이므로 MSELoss 사용
+criterion = nn.CrossEntropyLoss()  # 회귀 문제이므로 MSELoss 사용
 
 optimizer = optim.Adam(model.parameters(), lr=0.01)
 
@@ -120,5 +120,6 @@ acc = accuracy_score(y_test.cpu().numpy(), np.round(result.detach().cpu().numpy(
 print('acc는?', acc)
 
 '''
-
+최종 loss :  0.05373234674334526
+acc는? 0.8518518518518519
 '''

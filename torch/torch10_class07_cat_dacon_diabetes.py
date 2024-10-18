@@ -144,6 +144,6 @@ acc = accuracy_score(y_test.cpu().numpy(), np.round(result.detach().cpu().numpy(
 print('acc는?', acc)
 
 '''
-최종 loss :  198.90306091308594
-r2는? 0.9936496615409851
+최종 loss :  0.25290048122406006
+acc는? 0.7244897959183674
 '''

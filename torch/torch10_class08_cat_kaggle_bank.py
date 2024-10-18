@@ -27,6 +27,7 @@ torch.cuda.manual_seed(SEED)
 # 파일 경로 설정
 path = "./_data/kaggle/Bank/"
 
+
 # 데이터 로드
 re_train_csv = pd.read_csv(path + "replaced_train.csv", index_col=0)
 re_test_csv = pd.read_csv(path + "replaced_test.csv", index_col=0)
@@ -156,5 +157,6 @@ r2 = r2_score(y_test.cpu().numpy(), np.round(result.detach().cpu().numpy()))
 print('r2는?', r2)
 
 '''
-
+최종 loss :  0.09972984343767166
+r2는? 0.1825859546661377
 '''

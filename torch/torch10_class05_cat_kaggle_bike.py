@@ -145,6 +145,6 @@ r2 = r2_score(y_test.cpu().numpy(), np.round(result.detach().cpu().numpy()))
 print('r2는?', r2)
 
 '''
-최종 loss :  2414.812255859375
-r2는? 0.6318292021751404
+최종 loss :  198.90306091308594
+r2는? 0.9936496615409851
 '''
